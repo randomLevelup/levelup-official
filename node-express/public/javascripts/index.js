@@ -31,13 +31,17 @@ class Bubble { // large bubble class
             x: x,
             y: y
         }
+        this.baseRadius = radius
         this.radius = radius
 
         this.maxTime = 500 + Math.floor((Math.random()) * 200)
         this.time = Math.floor(Math.random() * this.maxTime)
+
+        this.hover = false
+        this.hoverTime = 0
     }
 
-    draw() {
+    drawTest() {
         c.beginPath()
         c.arc(this.pos.x, this.pos.y, this.radius, 0, tPi, false)
         c.fillStyle = '#053742'
@@ -45,6 +49,17 @@ class Bubble { // large bubble class
         c.strokeStyle = '#39A2DB'
         c.lineWidth = 5
         c.stroke()
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(this.pos.x, this.pos.y, this.radius, 0, tPi, false)
+        const grd = c.createRadialGradient(this.pos.x, this.pos.y, this.radius, this.pos.x, this.pos.y, 0)
+        grd.addColorStop(0, 'rgba(255, 255, 255, 0.8)')
+        grd.addColorStop(0.3, 'rgba(255, 255, 255, 0.3)')
+        grd.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        c.fillStyle = grd
+        c.fill()
     }
 
     getFloatPhase() {
@@ -59,7 +74,19 @@ class Bubble { // large bubble class
         else {
             this.time++
         }
-        this.pos.y += this.getFloatPhase()
+        this.pos.y += this.getFloatPhase() // float bubble
+
+        if (this.hover) {
+            if (this.radius < (this.baseRadius + 20)) {
+                this.radius += 0.4
+            }
+        }
+        else {
+            if (this.radius > this.baseRadius) {
+                this.radius -= 0.4
+            }
+        }
+
         this.draw()
     }
 }
@@ -85,9 +112,6 @@ class Spray extends Bubble {
         bubbles.forEach(bubble => {
             let dist = Math.hypot(bubble.pos.x - this.pos.x, bubble.pos.y - this.pos.y)
             dist -= (bubble.radius + 10)
-            if (dist < -10) { // garbage collection
-                this.trash = true
-            }
             if (dist <= 0) {
                 const v = this.vel
                 const n = this.getNormal(bubble)
@@ -96,7 +120,7 @@ class Spray extends Bubble {
                 const w = VM.sub(v, u)
                 this.vel = VM.sub(w, u)
             }
-        });
+        })
 
         // apply buoyancy and yFriction
         this.vel.y -= (this.vel.y > -1) ? 0.006 : 0
@@ -106,7 +130,7 @@ class Spray extends Bubble {
         this.pos.x += this.vel.x
         this.pos.y += this.vel.y
         
-        // more garbage collection
+        // pop surfaced bubbles
         if (!this.trash) {
             if (this.pos.y < -20) {
                 this.trash = true
@@ -138,10 +162,10 @@ class Terrain {
     drawExtrema() {
         this.extrema.forEach(ex => {
             c.beginPath()
-            c.arc(ex.x, ex.y, 5, 0, (2*Math.PI), false)
+            c.arc(ex.x, ex.y, 5, 0, tPi, false)
             c.fillStyle = 'mediumSpringGreen'
             c.fill()
-        });
+        })
     }
     traceCurve() {
         c.beginPath()
@@ -191,10 +215,11 @@ function animate() { // animation loop
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     terrB.drawFill()
+    terrM.drawFill()
 
     for (let i=sprays.length-1; i>=0; i--) {
         if (sprays[i].trash != 'false') {
-            sprays.splice(i, 1) // garbage collection
+            sprays.splice(i, 1) // take out the trash
         }
         else {
             sprays[i].updateSpray()
@@ -203,7 +228,6 @@ function animate() { // animation loop
     bubbles.forEach(bubble => {
         bubble.update() // float bubbles
     })
-    terrM.drawFill()
     terrF.drawFill()
 }
 
@@ -216,6 +240,19 @@ const terrB = new Terrain(350, '#2FA5C9')
 
 animate()
 
-setInterval(() => {
+setInterval(() => { // spawn spray
     addSpray(Math.random() * canvas.width)
-}, 400);
+}, 400)
+
+// mouse position
+addEventListener('mousemove', (pos) => {
+    bubbles.forEach(bubble => {
+        const dist = Math.hypot(bubble.pos.x - pos.clientX, bubble.pos.y - pos.clientY)
+        if (dist < bubble.radius) {
+            bubble.hover = true
+        }
+        else {
+            bubble.hover = false
+        }
+    })
+})
