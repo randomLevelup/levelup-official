@@ -40,6 +40,8 @@ class Bubble { // large bubble class
     draw() {
         c.beginPath()
         c.arc(this.pos.x, this.pos.y, this.radius, 0, tPi, false)
+        c.fillStyle = '#053742'
+        c.fill()
         c.strokeStyle = '#39A2DB'
         c.lineWidth = 5
         c.stroke()
@@ -68,6 +70,7 @@ class Spray extends Bubble {
             x: 0,
             y: 0
         }
+        this.trash = 'false'
     }
     getNormal(bubble) {
         const result = {
@@ -82,6 +85,9 @@ class Spray extends Bubble {
         bubbles.forEach(bubble => {
             let dist = Math.hypot(bubble.pos.x - this.pos.x, bubble.pos.y - this.pos.y)
             dist -= (bubble.radius + 10)
+            if (dist < -10) { // garbage collection
+                this.trash = true
+            }
             if (dist <= 0) {
                 const v = this.vel
                 const n = this.getNormal(bubble)
@@ -99,6 +105,13 @@ class Spray extends Bubble {
 
         this.pos.x += this.vel.x
         this.pos.y += this.vel.y
+        
+        // more garbage collection
+        if (!this.trash) {
+            if (this.pos.y < -20) {
+                this.trash = true
+            }
+        }
 
         this.draw()
     }
@@ -122,11 +135,16 @@ function animate() { // animation loop
     c.fillStyle = '#053742'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
+    for (i=sprays.length-1; i>=0; i--) {
+        if (sprays[i].trash != 'false') {
+            sprays.splice(i, 1) // garbage collection
+        }
+        else {
+            sprays[i].updateSpray()
+        }
+    }
     bubbles.forEach(bubble => {
         bubble.update()
-    })
-    sprays.forEach(spray => {
-        spray.updateSpray()
     })
 }
 
@@ -134,6 +152,8 @@ function animate() { // animation loop
 addBubble(300, 200, 100)
 addBubble(600, 300, 80)
 
-addSpray(250)
-addSpray(610)
 animate()
+
+setInterval(() => {
+    addSpray(Math.random() * canvas.width)
+}, 400);
