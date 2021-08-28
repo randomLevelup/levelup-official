@@ -118,6 +118,57 @@ class Spray extends Bubble {
 
 }
 
+class Terrain {
+    constructor(yLevel, fillColor) {
+        this.fillColor = fillColor
+        this.startPoint = {x: -10, y: yLevel, amp: 50}
+        this.extrema = [this.startPoint]
+        let pen = {x: this.startPoint.x, y: this.startPoint.y, amp: this.startPoint.amp}
+        const minMax = [-1, 1]
+        let ticker = 0
+        while (pen.x < canvas.width) { // generate terrain extrema
+            pen.x += 100 + (Math.random() * 150)
+            pen.y += (minMax[ticker % 2]) * (10 + (Math.random() * 50))
+            pen.amp = 50 + (Math.random() * 50)
+            this.extrema.push({x: pen.x, y: pen.y, amp: pen.amp})
+            ticker++
+        }
+    }
+
+    drawExtrema() {
+        this.extrema.forEach(ex => {
+            c.beginPath()
+            c.arc(ex.x, ex.y, 5, 0, (2*Math.PI), false)
+            c.fillStyle = 'mediumSpringGreen'
+            c.fill()
+        });
+    }
+    traceCurve() {
+        c.beginPath()
+        c.moveTo(this.extrema[0].x, this.extrema[0].y)
+        for (let i=1; i<this.extrema.length; i++) {
+            c.bezierCurveTo(
+                this.extrema[i-1].x + this.extrema[i-1].amp,
+                this.extrema[i-1].y,
+                this.extrema[i].x - this.extrema[i].amp,
+                this.extrema[i].y,
+                this.extrema[i].x,
+                this.extrema[i].y
+            )
+        }
+        // c.strokeStyle = 'cyan'
+        // c.lineWidth = 5
+        // c.stroke()
+    }
+    drawFill() {
+        this.traceCurve()
+        c.lineTo(canvas.width + 10, canvas.height + 10)
+        c.lineTo(0, canvas.height + 10)
+        c.fillStyle = this.fillColor
+        c.fill()
+    }
+}
+
 function addBubble(x, y, radius) {
     const bubbleToCreate = new Bubble(x, y, radius)
     bubbles.push(bubbleToCreate)
@@ -132,10 +183,16 @@ const sprays = []
 
 function animate() { // animation loop
     requestAnimationFrame(animate)
-    c.fillStyle = '#053742'
+    const grd = c.createLinearGradient(0, canvas.height, 0, 0)
+    grd.addColorStop(0, '#0F8AB4')
+    grd.addColorStop(1, '#6AEAEB')
+    c.beginPath()
+    c.fillStyle = grd
     c.fillRect(0, 0, canvas.width, canvas.height)
 
-    for (i=sprays.length-1; i>=0; i--) {
+    terrB.drawFill()
+
+    for (let i=sprays.length-1; i>=0; i--) {
         if (sprays[i].trash != 'false') {
             sprays.splice(i, 1) // garbage collection
         }
@@ -144,13 +201,18 @@ function animate() { // animation loop
         }
     }
     bubbles.forEach(bubble => {
-        bubble.update()
+        bubble.update() // float bubbles
     })
+    terrM.drawFill()
+    terrF.drawFill()
 }
 
 // init sequence
 addBubble(300, 200, 100)
 addBubble(600, 300, 80)
+const terrF = new Terrain(650, '#18618C')
+const terrM = new Terrain(500, '#0F8AB4')
+const terrB = new Terrain(350, '#2FA5C9')
 
 animate()
 
