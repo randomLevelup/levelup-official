@@ -25,14 +25,21 @@ class VM { // vector math abstract class
     }
 }
 
+function ramptoRadius(ramp, baseRadius) {
+    const exponent = (-0.5 * ramp) + 5
+    const divisor = 1 + (Math.E ** exponent)
+    return (20 / divisor) + baseRadius
+}
+
 class Bubble { // large bubble class
     constructor(x, y, radius) {
         this.pos = {
             x: x,
             y: y
         }
-        this.baseRadius = radius
         this.radius = radius
+        this.ramp = 0
+        this.baseRadius = radius
 
         this.maxTime = 500 + Math.floor((Math.random()) * 200)
         this.time = Math.floor(Math.random() * this.maxTime)
@@ -77,13 +84,15 @@ class Bubble { // large bubble class
         this.pos.y += this.getFloatPhase() // float bubble
 
         if (this.hover) {
-            if (this.radius < (this.baseRadius + 20)) {
-                this.radius += 0.4
+            if (this.ramp < 20) {
+                this.ramp += 0.4
+                this.radius = ramptoRadius(this.ramp, this.baseRadius)
             }
         }
         else {
-            if (this.radius > this.baseRadius) {
-                this.radius -= 0.4
+            if (this.ramp > 0) {
+                this.ramp -= 0.4
+                this.radius = ramptoRadius(this.ramp, this.baseRadius)
             }
         }
 
@@ -125,7 +134,9 @@ class Spray extends Bubble {
         // apply buoyancy and yFriction
         this.vel.y -= (this.vel.y > -1) ? 0.006 : 0
         //apply xFriction
-        this.vel.x -= (this.vel.x > 0) ? 0.001 : 0
+        if (Math.abs(this.vel.x) > 0) {
+            this.vel.x = this.vel.x * 0.993
+        }
 
         this.pos.x += this.vel.x
         this.pos.y += this.vel.y
