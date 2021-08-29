@@ -243,8 +243,11 @@ function animate() { // animation loop
 }
 
 // init sequence
-addBubble(300, 200, 100)
-addBubble(600, 300, 80)
+addBubble(270, 200, 130)
+addBubble(750, 300, 80)
+addBubble(1000, 390, 80)
+addBubble(500, 450, 80)
+addBubble(1200, 250, 80)
 const terrF = new Terrain(650, '#18618C')
 const terrM = new Terrain(500, '#0F8AB4')
 const terrB = new Terrain(350, '#2FA5C9')
