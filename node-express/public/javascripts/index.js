@@ -1,4 +1,4 @@
-const canvas = document.querySelector('canvas')
+const canvas = document.getElementById('canvas')
 const c = canvas.getContext('2d')
 
 canvas.width = innerWidth
@@ -30,9 +30,13 @@ function ramptoRadius(ramp, baseRadius) {
     const divisor = 1 + (Math.E ** exponent)
     return (20 / divisor) + baseRadius
 }
+function circleToSquare(radius) {
+    const toRoot = 2 * (radius ** 2)
+    return Math.sqrt(toRoot)
+}
 
 class Bubble { // large bubble class
-    constructor(x, y, radius) {
+    constructor(x, y, radius, imgSrc) {
         this.pos = {
             x: x,
             y: y
@@ -46,6 +50,8 @@ class Bubble { // large bubble class
 
         this.hover = false
         this.hoverTime = 0
+
+        this.imgSrc = imgSrc
     }
 
     drawTest() {
@@ -67,6 +73,16 @@ class Bubble { // large bubble class
         grd.addColorStop(1, 'rgba(255, 255, 255, 0)')
         c.fillStyle = grd
         c.fill()
+
+        if (this.imgSrc != 'none') {
+            const corner = {
+                x: this.pos.x - (this.radius * 0.73),
+                y: this.pos.y - (this.radius * 0.73)
+            }
+            const sideLength = circleToSquare(this.radius)
+            const img = document.getElementById(this.imgSrc)
+            c.drawImage(img, corner.x, corner.y, sideLength, sideLength)
+        }
     }
 
     getFloatPhase() {
@@ -106,6 +122,7 @@ class Spray extends Bubble {
             x: 0,
             y: 0
         }
+        this.imgSrc = 'none'
         this.trash = 'false'
     }
     getNormal(bubble) {
@@ -204,8 +221,8 @@ class Terrain {
     }
 }
 
-function addBubble(x, y, radius) {
-    const bubbleToCreate = new Bubble(x, y, radius)
+function addBubble(x, y, radius, imgSrc) {
+    const bubbleToCreate = new Bubble(x, y, radius, imgSrc)
     bubbles.push(bubbleToCreate)
 }
 function addSpray(x) {
@@ -243,11 +260,11 @@ function animate() { // animation loop
 }
 
 // init sequence
-addBubble(270, 200, 130)
-addBubble(750, 300, 80)
-addBubble(1000, 390, 80)
-addBubble(500, 450, 80)
-addBubble(1200, 250, 80)
+addBubble(270, 200, 130, 'none')
+addBubble(750, 300, 80, 'mazeSource')
+addBubble(1000, 390, 80, 'physicsSource')
+addBubble(500, 450, 80, 'nodesSource')
+addBubble(1200, 250, 80, 'splinesSource')
 const terrF = new Terrain(650, '#18618C')
 const terrM = new Terrain(500, '#0F8AB4')
 const terrB = new Terrain(350, '#2FA5C9')
