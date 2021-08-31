@@ -36,7 +36,7 @@ function circleToSquare(radius) {
 }
 
 class Bubble { // large bubble class
-    constructor(x, y, radius, imgSrc) {
+    constructor(x, y, radius, imgSrc, linkExt) {
         this.pos = {
             x: x,
             y: y
@@ -52,6 +52,7 @@ class Bubble { // large bubble class
         this.hoverTime = 0
 
         this.imgSrc = imgSrc
+        this.linkExt = linkExt
     }
 
     drawTest() {
@@ -221,8 +222,8 @@ class Terrain {
     }
 }
 
-function addBubble(x, y, radius, imgSrc) {
-    const bubbleToCreate = new Bubble(x, y, radius, imgSrc)
+function addBubble(x, y, radius, imgSrc, linkExt) {
+    const bubbleToCreate = new Bubble(x, y, radius, imgSrc, linkExt)
     bubbles.push(bubbleToCreate)
 }
 function addSpray(x) {
@@ -260,11 +261,11 @@ function animate() { // animation loop
 }
 
 // init sequence
-addBubble(270, 200, 130, 'none')
-addBubble(750, 300, 80, 'mazeSource')
-addBubble(1000, 390, 80, 'physicsSource')
-addBubble(500, 450, 80, 'nodesSource')
-addBubble(1200, 250, 80, 'splinesSource')
+addBubble(270, 200, 130, 'none', 'none')
+addBubble(750, 300, 80, 'mazeSource', 'maze')
+addBubble(1000, 390, 80, 'physicsSource', 'none')
+addBubble(500, 450, 80, 'nodesSource', 'none')
+addBubble(1200, 250, 80, 'splinesSource', 'none')
 const terrF = new Terrain(650, '#18618C')
 const terrM = new Terrain(500, '#0F8AB4')
 const terrB = new Terrain(350, '#2FA5C9')
@@ -275,7 +276,7 @@ setInterval(() => { // spawn spray
     addSpray(Math.random() * canvas.width)
 }, 400)
 
-// mouse position
+// bubble hover
 addEventListener('mousemove', (pos) => {
     bubbles.forEach(bubble => {
         const dist = Math.hypot(bubble.pos.x - pos.clientX, bubble.pos.y - pos.clientY)
@@ -284,6 +285,19 @@ addEventListener('mousemove', (pos) => {
         }
         else {
             bubble.hover = false
+        }
+    })
+})
+
+// bubble click
+addEventListener('mousedown', (pos) => {
+    bubbles.forEach(bubble => {
+        const dist = Math.hypot(bubble.pos.x - pos.clientX, bubble.pos.y - pos.clientY)
+        if (dist < bubble.radius) {
+            if (bubble.linkExt != 'none') {
+                const linkTo = '../' + bubble.linkExt + '.html'
+                location = linkTo
+            }
         }
     })
 })
