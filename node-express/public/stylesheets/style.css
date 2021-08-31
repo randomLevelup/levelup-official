@@ -1,8 +1,26 @@
+@font-face {
+  font-family: 'Gaz';
+  src: url('Gaz.woff2') format('woff2'),
+       url('Gaz.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
+  background-color: #222831;
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px "Arial";
 }
 
 a {
   color: #00B7FF;
+}
+
+h1 {
+  position: relative;
+  font-size: 50px;
+  color: #FFD369;
+  padding: 10px 20px;
+  margin: 0 -20px 12px -20px;
 }
