@@ -261,11 +261,11 @@ function animate() { // animation loop
 }
 
 // init sequence
-addBubble(270, 200, 130, 'none', 'none')
+addBubble(270, 200, 130, 'none', 'about')
 addBubble(750, 300, 80, 'mazeSource', 'maze')
-addBubble(1000, 390, 80, 'physicsSource', 'none')
-addBubble(500, 450, 80, 'nodesSource', 'none')
-addBubble(1200, 250, 80, 'splinesSource', 'none')
+addBubble(1000, 390, 80, 'physicsSource', 'bouncy')
+addBubble(500, 450, 80, 'nodesSource', 'nodes')
+addBubble(1200, 250, 80, 'splinesSource', 'spline')
 const terrF = new Terrain(650, '#18618C')
 const terrM = new Terrain(500, '#0F8AB4')
 const terrB = new Terrain(350, '#2FA5C9')
