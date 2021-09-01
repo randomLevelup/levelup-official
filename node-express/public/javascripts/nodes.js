@@ -28,7 +28,7 @@ const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
-String.prototype.hexToRgbA = function() {
+String.prototype.hexToRgbA = function() { // imported this function
     var c;
     if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(this)){
         c = this.substring(1).split('')
@@ -42,7 +42,6 @@ String.prototype.hexToRgbA = function() {
 }
 String.prototype.setAlpha = function(value) {
     const alphaIndex = this.lastIndexOf(',')+1
-    
     return this.substr(0, alphaIndex) + value + ')'
 }
 
