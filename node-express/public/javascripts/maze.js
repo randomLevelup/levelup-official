@@ -64,14 +64,14 @@ const padding = 100
 const cellWidth = 40
 
 Array.prototype.drawGrid = function() {
-    c.strokeStyle = 'white'
-    c.fillStyle = 'white'
+    c.strokeStyle = '#EEEEEE'
+    c.fillStyle = '#EEEEEE'
     c.lineWidth = 8
 
     grid.forEach((row, i) => {
         row.forEach((cell, j) => {
             const center = {
-                x: padding + (cellWidth * j),
+                x: 450 + (cellWidth * j), // wouldve used padding, no time
                 y: padding + (cellWidth * i)
             }
             dirKeys.forEach(key => {
@@ -216,7 +216,7 @@ class Player {
             element = this
         }
         return {
-            x: padding + (cellWidth * element.c),
+            x: 450 + (cellWidth * element.c),
             y: padding + (cellWidth * element.r)
         }
     }
@@ -253,18 +253,18 @@ class Player {
         }
         c.beginPath()
         c.arc(trailPos.x, trailPos.y, 7, 0, (2*Math.PI), false)
-        c.fillStyle = 'red'
+        c.fillStyle = '#FFD369'
         c.fill()
 
         c.beginPath()
         c.arc(drawPos.x, drawPos.y, 7, 0, (2*Math.PI), false)
-        c.fillStyle = 'lime'
+        c.fillStyle = '#FFD369'
         c.fill()
 
         c.beginPath()
         c.moveTo(trailPos.x, trailPos.y)
         c.lineTo(drawPos.x, drawPos.y)
-        c.strokeStyle = 'cornflowerBlue'
+        c.strokeStyle = '#FFD369'
         c.lineWidth = 14
         c.stroke()
     }
@@ -289,7 +289,7 @@ const player = new Player()
 
 function animate() {
     requestAnimationFrame(animate)
-    c.fillStyle = 'black'
+    c.fillStyle = '#393E46'
     c.fillRect(0, 0, canvas.width, canvas.height)
     grid.drawGrid()
 
