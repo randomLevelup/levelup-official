@@ -7,8 +7,8 @@
   font-display: swap;
 
   font-family: 'cream DEMO';
-  src: url('cream-DEMO.woff2') format('woff2'),
-      url('cream-DEMO.woff') format('woff');
+  src: url('../fonts/cream-DEMO.woff2') format('woff2'),
+       url('../fonts/cream-DEMO.woff') format('woff');
 }
 
 body {

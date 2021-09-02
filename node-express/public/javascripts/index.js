@@ -261,7 +261,7 @@ function animate() { // animation loop
 }
 
 // init sequence
-addBubble(270, 200, 130, 'none', 'about')
+addBubble(270, 200, 130, 'aboutSource', 'about')
 addBubble(750, 300, 80, 'mazeSource', 'maze')
 addBubble(1000, 390, 80, 'physicsSource', 'bouncy')
 addBubble(500, 450, 80, 'nodesSource', 'nodes')

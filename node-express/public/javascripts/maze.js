@@ -71,7 +71,7 @@ Array.prototype.drawGrid = function() {
     grid.forEach((row, i) => {
         row.forEach((cell, j) => {
             const center = {
-                x: 450 + (cellWidth * j), // wouldve used padding, no time
+                x: 300 + (cellWidth * j), // wouldve used padding, no time
                 y: padding + (cellWidth * i)
             }
             dirKeys.forEach(key => {
@@ -216,7 +216,7 @@ class Player {
             element = this
         }
         return {
-            x: 450 + (cellWidth * element.c),
+            x: 300 + (cellWidth * element.c),
             y: padding + (cellWidth * element.r)
         }
     }
@@ -292,6 +292,9 @@ function animate() {
     c.fillStyle = '#393E46'
     c.fillRect(0, 0, canvas.width, canvas.height)
     grid.drawGrid()
+
+    const img = document.getElementById('wasd')
+    c.drawImage(img, 900, 250, 264, 173)
 
     player.update()
 }
