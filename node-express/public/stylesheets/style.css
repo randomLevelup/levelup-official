@@ -5,6 +5,10 @@
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+
+  font-family: 'cream DEMO';
+  src: url('cream-DEMO.woff2') format('woff2'),
+      url('cream-DEMO.woff') format('woff');
 }
 
 body {
@@ -21,6 +25,18 @@ h1 {
   position: relative;
   font-size: 50px;
   color: #FFD369;
-  padding: 10px 20px;
+  padding: 50px 100px;
   margin: 0 -20px 12px -20px;
+}
+
+p {
+  position: relative;
+  font-size: 25px;
+  color: #FFD369;
+  padding: 0px 30px;
+  margin: 0 -20px 12px -20px;
+}
+
+li {
+  color: #FFD369
 }
