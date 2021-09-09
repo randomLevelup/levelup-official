@@ -13,30 +13,37 @@
 
 body {
   background-color: #222831;
-  padding: 50px;
+  padding: 20px;
   font: 14px "Arial";
 }
 
 a {
-  color: #00B7FF;
+  color: #6E93CC;
+}
+
+a:visited {
+  color: #8293AD;
+}
+
+.central {
+  font-weight: normal;
+  font-family: normal;
 }
 
 h1 {
+  font-family: 'gaz';
   position: relative;
   font-size: 50px;
   color: #FFD369;
-  padding: 50px 100px;
-  margin: 0 -20px 12px -20px;
-}
-
-p {
-  position: relative;
-  font-size: 25px;
-  color: #FFD369;
-  padding: 0px 30px;
-  margin: 0 -20px 12px -20px;
+  padding-top: 50px;
+  padding-left: 50px;
 }
 
 li {
-  color: #FFD369
+  font-family: 'cream DEMO';
+  font-size: 25px;
+  position: relative;
+  color: #FFD369;
+  padding: 0px 30px;
+  margin: 50px 20px 20px 70px;
 }
