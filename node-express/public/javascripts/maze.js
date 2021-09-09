@@ -221,102 +221,102 @@ class Player {
         }
     }
 
+
     draw() {
         let drawPos = this.getPos()
-        let trailPos = this.getPos()
+        let time = 0
+        let dir = {x: 0, y: 0}
         
         if (this.moveLog.length > 0) {
-            if (this.moveLog[0].t < maxTime) {
-                drawPos = this.getPos(this.moveLog[0].p)
-                drawPos = {
-                    x: drawPos.x + ((cellWidth / maxTime) * this.moveLog[0].t * (dirDict[this.moveLog[0].d].x)),
-                    y: drawPos.y + ((cellWidth / maxTime) * this.moveLog[0].t * (dirDict[this.moveLog[0].d].y))
-                }
-                trailPos = this.getPos(this.moveLog[0].p)
-            }
-            else {
-                trailPos = this.getPos(this.moveLog[0].p)
-                let trailTime = this.moveLog[0].t - maxTime
-                trailTime = (trailTime < 0) ? 0 : trailTime
-                trailPos = {
-                    x: trailPos.x + ((cellWidth / maxTime) * trailTime * (dirDict[this.moveLog[0].d].x)),
-                    y: trailPos.y + ((cellWidth / maxTime) * trailTime * (dirDict[this.moveLog[0].d].y))
-                }
-                if (this.moveLog.length > 1) {
-                    drawPos = this.getPos(this.moveLog[1].p)
-                    drawPos = {
-                        x: drawPos.x + ((cellWidth / maxTime) * this.moveLog[1].t * (dirDict[this.moveLog[1].d].x)),
-                        y: drawPos.y + ((cellWidth / maxTime) * this.moveLog[1].t * (dirDict[this.moveLog[1].d].y))
-                    }
-                }
+            drawPos = this.getPos(this.moveLog[0].p)
+            time = this.moveLog[0].t
+            dir = {
+                x: dirDict[this.moveLog[0].d].x,
+                y: dirDict[this.moveLog[0].d].y
             }
         }
-        c.beginPath()
-        c.arc(trailPos.x, trailPos.y, 7, 0, (2*Math.PI), false)
-        c.fillStyle = '#FFD369'
-        c.fill()
+        traceArr.push({
+            x: drawPos.x + ((cellWidth / maxTime) * time * dir.x),
+            y: drawPos.y + ((cellWidth / maxTime) * time * dir.y),
+            t: 0
+        })
 
-        c.beginPath()
-        c.arc(drawPos.x, drawPos.y, 7, 0, (2*Math.PI), false)
-        c.fillStyle = '#FFD369'
-        c.fill()
-
-        c.beginPath()
-        c.moveTo(trailPos.x, trailPos.y)
-        c.lineTo(drawPos.x, drawPos.y)
-        c.strokeStyle = '#FFD369'
-        c.lineWidth = 14
-        c.stroke()
+        for (i=0; i<traceArr.length; i++) {
+            if (traceArr[i].t == trailLength) {
+                c.beginPath()
+                c.arc(traceArr[i].x, traceArr[i].y, 8, 0, (2*Math.PI), false)
+                c.fillStyle = '#393E46'
+                c.fill()
+                traceArr.splice(i, 1)
+                i--
+            }
+            else if (traceArr[i].t >= 0) {
+                c.beginPath()
+                c.arc(traceArr[i].x, traceArr[i].y, 7, 0, (2*Math.PI), false)
+                c.fillStyle = '#FFD369'
+                c.fill()
+                traceArr[i].t++
+            }
+            else {
+                traceArr[i].t++
+            }
+        }
+        if (this.moveLog.length == 0) {
+            c.beginPath()
+            c.arc(this.getPos().x, this.getPos().y, 7, 0, (2*Math.PI), false)
+            c.fillStyle = '#FFD369'
+            c.fill()
+        }
     }
 
     update() {
         if (this.moveLog.length > 0) {
             this.moveLog[0].t++ // increment first move
+
             if (this.moveLog[0].t > maxTime) {
-                if (this.moveLog.length > 1) {
-                    this.moveLog[1].t++ // increment second move
-                }
-                if (this.moveLog[0].t > maxTime * 2) {
-                    this.moveLog.splice(0, 1)
-                }
+                this.moveLog.splice(0, 1)
             }
         }
+
         this.draw()
     }
 }
 
 const player = new Player()
+c.fillStyle = '#393E46'
+c.fillRect(0, 0, canvas.width, canvas.height)
+grid.drawGrid()
+const img = document.getElementById('wasd')	
+c.drawImage(img, 900, 250, 264, 173)
+
+const traceArr = []
 
 function animate() {
     requestAnimationFrame(animate)
-    c.fillStyle = '#393E46'
-    c.fillRect(0, 0, canvas.width, canvas.height)
-    grid.drawGrid()
-
-    const img = document.getElementById('wasd')
-    c.drawImage(img, 900, 250, 264, 173)
-
     player.update()
 }
 
 const maxTime = 15
+const trailLength = 20
 animate()
 
 addEventListener('keypress', (event) => {
-    const direction = {
-        w: {r: -1, c: 0},
-        s: {r: 1, c: 0},
-        a: {r: 0, c: -1},
-        d: {r: 0, c: 1},
-    }
-    const dirToCardinal = {w: 'n', s: 's', a: 'w', d: 'e'}
-    const wallToTest = grid[player.r][player.c].walls[dirToCardinal[event.key]]
-    if (!wallToTest) {
-        player.moveLog.push({
-            p: {r: player.r, c: player.c},
-            d: dirToCardinal[event.key],
-            t: 0
-        })
-        player.move(direction[event.key])
+    if ('wasd'.indexOf(event.key) != -1) {
+        const direction = {
+            w: {r: -1, c: 0},
+            s: {r: 1, c: 0},
+            a: {r: 0, c: -1},
+            d: {r: 0, c: 1},
+        }
+        const dirToCardinal = {w: 'n', s: 's', a: 'w', d: 'e'}
+        const wallToTest = grid[player.r][player.c].walls[dirToCardinal[event.key]]
+        if (!wallToTest) {
+            player.moveLog.push({
+                p: {r: player.r, c: player.c},
+                d: dirToCardinal[event.key],
+                t: 0
+            })
+            player.move(direction[event.key])
+        }
     }
 })
