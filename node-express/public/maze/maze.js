@@ -165,6 +165,7 @@ addEventListener('mousedown', (event) => {
     if (phase == 'start' && buttonFade) {
         phase = 'generate'
     }
+    console.log(phase)
 })
 
 class Player {
@@ -243,6 +244,16 @@ class Player {
 
             if (this.moveLog[0].t > maxTime) {
                 this.moveLog.splice(0, 1)
+            }
+        }
+        else {
+            if (this.r == mazeSize-1 && this.c == mazeSize-1) {
+                this.r = 0
+                this.c = 0
+                c.fillStyle = '#393E46'
+                c.fillRect(0, 0, canvas.width, canvas.height)
+                gridDrawTime = 0
+                phase = 'start'
             }
         }
 
@@ -365,12 +376,9 @@ function animate() {
     else if (phase == 'solve') {
         if (player == null) {player = new Player}
         player.update()
-        
-        // check if player is in bottom left,
-        // if so, phase = repeat
     }
     else {
-        // draw repeat button similar to start button
+        
     }
 }
 
