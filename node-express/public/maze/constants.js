@@ -37,7 +37,7 @@ const traceArr = []
 const maxTime = 15
 const trailLength = 20
 
-const wasdImg = document.getElementById('wasd')
+const helpImg = document.getElementById('instructions')
 const generateImg = document.getElementById('generate')
 
 var buttonFade = false

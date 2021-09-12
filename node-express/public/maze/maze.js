@@ -368,17 +368,17 @@ function animate() {
                 }
             }
             else {
+                c.drawImage(helpImg, 800, 150, 257, 356)
                 phase = 'solve'
             }
             gridDrawTime++
         }
     }
     else if (phase == 'solve') {
-        if (player == null) {player = new Player}
+        if (player == null) {
+            player = new Player
+        }
         player.update()
-    }
-    else {
-        
     }
 }
 
