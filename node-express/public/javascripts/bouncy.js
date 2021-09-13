@@ -220,8 +220,7 @@ let maxHits = 0
 
 function animate() {
     requestAnimationFrame(animate)
-    cfg.ballData.speed = (0.15) * delta
-    console.log(Math.floor(cfg.ballData.speed))
+    cfg.ballData.speed = (0.15) * delta // change speed based on percieved framerate
 
     c.fillStyle = cfg.simData.bgColor
     c.fillRect(0, 0, canvas.width, canvas.height)
