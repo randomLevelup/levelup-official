@@ -37,6 +37,18 @@ const cfg = {
     }
 }
 
+// new canvas framerate detection
+let x=100, y=100
+let lastRender = Date.now()
+let delta
+function render() {
+    delta = Date.now() - lastRender
+    lastRender = Date.now()
+    requestAnimationFrame(render)
+}
+render()
+//
+
 String.prototype.hexToRgbA = function() { // imported this function
     var c;
     if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(this)){
@@ -209,6 +221,9 @@ let maxHits = 0
 
 function animate() {
     requestAnimationFrame(animate)
+    cfg.ballData.speed = 60 / delta
+    console.log(cfg.ballData.speed)
+
     c.fillStyle = cfg.simData.bgColor
     c.fillRect(0, 0, canvas.width, canvas.height)
 
