@@ -1,7 +1,13 @@
+const canvas = document.querySelector('canvas')
+const c = canvas.getContext('2d')
+
+canvas.width = innerWidth
+canvas.height = innerHeight
+
 const cfg = {
     ballData: {
-        speed: 1.2,
-        radius: 50, // must be integer
+        speed: 3,
+        radius: canvas.height / 13, // must be integer
         color: "#4CA1A3",
         lineWidth: 3
     },
@@ -48,11 +54,6 @@ String.prototype.setAlpha = function(value) {
     return this.substr(0, alphaIndex) + value + ')'
 }
 
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
-
-canvas.width = innerWidth
-canvas.height = innerHeight
 const limit = cfg.ballData.radius * 2 // edge depth: radius 100
 
 class VM { // vector math abstract class
