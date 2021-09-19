@@ -5,6 +5,30 @@ canvas.width = innerWidth
 canvas.height = innerHeight
 const tPi = 2 * Math.PI
 
+const cfg = {
+    speed: {
+        bigBubbleRamp: 0.4,
+        bounceTime: 1,
+        spraySpeed: 1,
+    },
+    size: {
+
+    },
+    vis: {
+        showBeziers: false,
+        showSplines: false
+    }
+}
+
+let lastFPS = Date.now()
+let delta
+function checkFPS() {
+    delta = Date.now() - lastFPS
+    lastFPS = Date.now()
+    requestAnimationFrame(checkFPS)
+}
+checkFPS()
+
 class VM { // vector math abstract class
     static dot(a, b) {
         return (a.x * b.x) + (a.y * b.y)
@@ -96,19 +120,19 @@ class Bubble { // large bubble class
             this.time = 0
         }
         else {
-            this.time++
+            this.time += cfg.speed.bounceTime
         }
         this.pos.y += this.getFloatPhase() // float bubble
 
         if (this.hover) {
             if (this.ramp < 20) {
-                this.ramp += 0.4
+                this.ramp += cfg.speed.bigBubbleRamp
                 this.radius = ramptoRadius(this.ramp, this.baseRadius)
             }
         }
         else {
             if (this.ramp > 0) {
-                this.ramp -= 0.4
+                this.ramp -= cfg.speed.bigBubbleRamp
                 this.radius = ramptoRadius(this.ramp, this.baseRadius)
             }
         }
@@ -156,8 +180,8 @@ class Spray extends Bubble {
             this.vel.x = this.vel.x * 0.993
         }
 
-        this.pos.x += this.vel.x
-        this.pos.y += this.vel.y
+        this.pos.x += this.vel.x * cfg.speed.spraySpeed
+        this.pos.y += this.vel.y * cfg.speed.spraySpeed
         
         // pop surfaced bubbles
         if (!this.trash) {
@@ -209,9 +233,11 @@ class Terrain {
                 this.extrema[i].y
             )
         }
-        // c.strokeStyle = 'cyan'
-        // c.lineWidth = 5
-        // c.stroke()
+        if (cfg.vis.showSplines) {
+            c.strokeStyle = 'cyan'
+            c.lineWidth = 5
+            c.stroke()
+        }
     }
     drawFill() {
         this.traceCurve()
@@ -219,6 +245,9 @@ class Terrain {
         c.lineTo(0, canvas.height + 10)
         c.fillStyle = this.fillColor
         c.fill()
+        if (cfg.vis.showBeziers) {
+            this.drawExtrema()
+        }
     }
 }
 
@@ -233,9 +262,18 @@ function addSpray(x) {
 
 const bubbles = []
 const sprays = []
+let okToSpawn = false
 
 function animate() { // animation loop
     requestAnimationFrame(animate)
+
+    cfg.speed = {
+        bigBubbleRamp: delta * 0.08,
+        bounceTime: delta * 0.2,
+        spraySpeed: delta * 0.18
+    }
+    okToSpawn = true // confirms that canvas window is visible
+
     const grd = c.createLinearGradient(0, canvas.height, 0, 0)
     grd.addColorStop(0, '#0F8AB4')
     grd.addColorStop(1, '#6AEAEB')
@@ -273,7 +311,10 @@ const terrB = new Terrain(350, '#2FA5C9')
 animate()
 
 setInterval(() => { // spawn spray
-    addSpray(Math.random() * canvas.width)
+    if (okToSpawn) { // will only spawn if the canvas window is in view
+        addSpray(Math.random() * canvas.width)
+        okToSpawn = false
+    }
 }, 400)
 
 // bubble hover
