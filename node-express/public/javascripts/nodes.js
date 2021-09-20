@@ -18,7 +18,7 @@ lineData: {
 simData: {
     bgColor: "#0A1931",
     spawnTime: 80,
-    magnetStrength: 1
+    magnetStrength: 10
 }
 }
 
@@ -27,6 +27,15 @@ const c = canvas.getContext('2d')
 
 canvas.width = innerWidth
 canvas.height = innerHeight
+
+let lastFPS = Date.now()
+let delta
+function checkFPS() {
+    delta = Date.now() - lastFPS
+    lastFPS = Date.now()
+    requestAnimationFrame(checkFPS)
+}
+checkFPS()
 
 String.prototype.hexToRgbA = function() { // imported this function
     var c;
@@ -100,6 +109,7 @@ class Node {
 }
 
 const nodes = []
+let okToSpawn = false
 
 function spawnNode() {
 let spawnX = Math.floor(Math.random() * canvas.width)
@@ -126,48 +136,51 @@ nodes.push(node)
 }
 
 function animate() {
-requestAnimationFrame(animate)
-c.fillStyle = cfg.simData.bgColor
-c.fillRect(0, 0, canvas.width, canvas.height)
+    requestAnimationFrame(animate)
+    c.fillStyle = cfg.simData.bgColor
+    c.fillRect(0, 0, canvas.width, canvas.height)
 
-if (nodes.length > 0) {
-    nodes.forEach((node, index) => {
-        node.update()
+    cfg.nodeData.speed = delta * 0.14
+    okToSpawn = true
 
-        if (
-            node.x + 10 < 0 ||
-            node.x - 10 > canvas.width ||
-            node.y + 10 < 0 ||
-            node.y - 10 > canvas.height
-        ) {
-            setTimeout(() => {nodes.splice(index, 1)}, 0)
-        }
+    if (nodes.length > 0) {
+        nodes.forEach((node, index) => {
+            node.update()
+
+            if (
+                node.x + 10 < 0 ||
+                node.x - 10 > canvas.width ||
+                node.y + 10 < 0 ||
+                node.y - 10 > canvas.height
+            ) {
+                setTimeout(() => {nodes.splice(index, 1)}, 0)
+            }
+        })
+    }
+
+    // lines
+    nodes.forEach((nodeA, indexA) => {
+        nodes.forEach((nodeB, indexB) => {
+            if (indexA > indexB) {
+                distance = Math.hypot(
+                    (nodeA.x - nodeB.x),
+                    (nodeA.y - nodeB.y)
+                )
+                let alphaValue = (
+                    ((1 / distance) * cfg.lineData.opacityMult) - cfg.lineData.threshold
+                )
+                alphaValue = (alphaValue < 0) ? 0 : alphaValue
+
+                let strokeColor = cfg.lineData.color.hexToRgbA()
+                c.strokeStyle = strokeColor.setAlpha(alphaValue)
+                c.lineWidth = cfg.lineData.width
+                c.beginPath()
+                c.moveTo(nodeA.x, nodeA.y)
+                c.lineTo(nodeB.x, nodeB.y)
+                c.stroke()
+            }
+        })
     })
-}
-
-// lines
-nodes.forEach((nodeA, indexA) => {
-    nodes.forEach((nodeB, indexB) => {
-        if (indexA > indexB) {
-            distance = Math.hypot(
-                (nodeA.x - nodeB.x),
-                (nodeA.y - nodeB.y)
-            )
-            let alphaValue = (
-                ((1 / distance) * cfg.lineData.opacityMult) - cfg.lineData.threshold
-            )
-            alphaValue = (alphaValue < 0) ? 0 : alphaValue
-
-            let strokeColor = cfg.lineData.color.hexToRgbA()
-            c.strokeStyle = strokeColor.setAlpha(alphaValue)
-            c.lineWidth = cfg.lineData.width
-            c.beginPath()
-            c.moveTo(nodeA.x, nodeA.y)
-            c.lineTo(nodeB.x, nodeB.y)
-            c.stroke()
-        }
-    })
-})
 }
 
 const mousePos = {x: 0, y: 0}
@@ -176,5 +189,10 @@ mousePos.x = pos.clientX
 mousePos.y = pos.clientY
 })
 
-setInterval(() => {spawnNode()}, cfg.simData.spawnTime)
+setInterval(() => {
+    if (okToSpawn) {
+        spawnNode()
+        okToSpawn = false
+    }
+}, cfg.simData.spawnTime)
 animate()
