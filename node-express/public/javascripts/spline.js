@@ -35,20 +35,40 @@ class Spline {
      */
     draw() {
         this.pairs.forEach(pair => {
-            c.fillStyle = 'white'
             c.strokeStyle = 'white'
 
             // draw lines (not implemented yet)
 
-            c.lineWidth = 2
-            c.beginPath()
-            c.arc(pair[1][0], pair[1][1], 4, 0, (2*Math.PI), false)
-            c.stroke()
+
+            c.fillStyle = 'black';
+            [-1,1].forEach(flip => {                
+                const difference = [pair[0][0] - pair[1][0],
+                                    pair[0][1] - pair[1][1]]
+
+                c.lineWidth = 1
+                c.beginPath()
+                c.moveTo(pair[0][0], pair[0][1])
+                c.lineTo(pair[0][0] + (flip * difference[0]),
+                         pair[0][1] + (flip * difference[1]))
+                c.stroke()
+
+                c.lineWidth = 2
+                c.beginPath()
+                c.arc(
+                    pair[0][0] + (flip * difference[0]),
+                    pair[0][1] + (flip * difference[1]),
+                    6, 0, (2*Math.PI), false
+                )
+                c.fill()
+                c.stroke()
+            })
+
 
             // draw curve (not implemented yet)
 
             c.beginPath()
-            c.arc(pair[0][0], pair[0][1], 4, 0, (2*Math.PI), false)
+            c.arc(pair[0][0], pair[0][1], 6, 0, (2*Math.PI), false)
+            c.fillStyle = 'white'
             c.fill()
         })
     }
