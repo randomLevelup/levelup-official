@@ -18,7 +18,7 @@ lineData: {
 simData: {
     bgColor: "#0A1931",
     spawnTime: 80,
-    magnetStrength: 10
+    magnetStrength: 3
 }
 }
 
@@ -141,6 +141,7 @@ function animate() {
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     cfg.nodeData.speed = delta * 0.14
+    cfg.simData.magnetStrength = (delta * 0.47) + 0.6
     okToSpawn = true
 
     if (nodes.length > 0) {
