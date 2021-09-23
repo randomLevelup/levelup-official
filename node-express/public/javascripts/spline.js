@@ -63,8 +63,28 @@ class Spline {
                 c.stroke()
             })
 
-
-            // draw curve (not implemented yet)
+            if (this.pairs.length > 1) {
+                for (i=1; i<this.pairs.length; i++) {
+                    const inArr = [
+                        this.pairs[i-1][0],
+                        this.pairs[i-1][1],
+                        this.pairs[i][1],
+                        this.pairs[i][0]
+                    ]
+                    for (t=0; t<=1; t+=0.2) { // resolution = 5 for now
+                        while (inArr.length > 1) {
+                            for (j=1; j<inArr.length; j++) {
+                                let vec = getVector(inArr[j-1], inArr[j])
+                                vec = scale(vec, t)
+                                inArr[j-1] = addVector(inArr[j-1], vec)
+                            }
+                            inArr.pop()
+                        }
+                        // final point yaaay?
+                    }
+                }
+            }
+            //
 
             c.beginPath()
             c.arc(pair[0][0], pair[0][1], 6, 0, (2*Math.PI), false)
