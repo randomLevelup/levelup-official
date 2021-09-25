@@ -52,12 +52,9 @@ class Spline {
      */
     draw() {
         this.pairs.forEach(pair => {
-            c.strokeStyle = 'white'
+            c.strokeStyle = '#ebabc7'
 
-            // draw lines (not implemented yet)
-
-
-            c.fillStyle = 'black';
+            c.fillStyle = '#0F1123';
             [-1,1].forEach(flip => {                
                 const difference = [pair[0][0] - pair[1][0],
                                     pair[0][1] - pair[1][1]]
@@ -80,7 +77,7 @@ class Spline {
                 c.stroke()
             })
 
-            c.strokeStyle = 'yellow'
+            c.strokeStyle = '#A6F0C6'
             c.lineWidth = 5
             if (this.pairs.length > 1) {
                 for (let i=1; i<this.pairs.length; i++) {
@@ -118,7 +115,7 @@ class Spline {
 
             c.beginPath()
             c.arc(pair[0][0], pair[0][1], 6, 0, (2*Math.PI), false)
-            c.fillStyle = 'white'
+            c.fillStyle = '#ebabc7'
             c.fill()
         })
     }
@@ -202,13 +199,13 @@ addEventListener('mousemove', e => {
 
 /**Animate Frames:
  *  theres a better way, but for now:
- *  fill frame with black
+ *  fill frame with #0F1123
  *  foreach splines:
  *      spline.draw()
  */
 function animate() {
     requestAnimationFrame(animate)
-    c.fillStyle = 'black'
+    c.fillStyle = '#0F1123'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     splines.forEach(spline => {
