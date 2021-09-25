@@ -145,7 +145,7 @@ addEventListener("mousedown", e => {
         splines.forEach((spline, i) => {
             spline.pairs.forEach((pair, j) => {
                 pair.forEach((point, k) => {
-                    distance = Math.abs(Math.hypot((e.clientX - point[0]), (e.clientX - point[1])))
+                    const distance = Math.hypot((e.clientX - point[0]), (e.clientY - point[1]))
                     if (distance < 10) {
                         pointFound = true
                         mode = ['movePoint', i, j, k]
@@ -175,6 +175,10 @@ addEventListener("mousedown", e => {
  *      if a spline is active:
  *          deactivate the spline
  */
+addEventListener('contextmenu', e => {
+    e.preventDefault()
+    activeSpline = false
+})
 
 /**On mouseUp:
  *  if mode = moveEndpoint / moveHandle:
