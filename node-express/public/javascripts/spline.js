@@ -4,6 +4,23 @@ const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+class VM { // simple abstract vector math class
+    static get(p, q) {
+        const result = [q[0]-p[0], q[1]-p[1]]
+        return (result)
+    }
+
+    static scale(v, s) {
+        const result = [v[0] * s, v[1] * s]
+        return result
+    }
+
+    static add(u, v) {
+        const result = [u[0] + v[0], u[1] + v[1]]
+        return result
+    }
+}
+
 class Spline {
     constructor() {
         this.pairs = []
@@ -63,25 +80,38 @@ class Spline {
                 c.stroke()
             })
 
+            c.strokeStyle = 'yellow'
+            c.lineWidth = 5
             if (this.pairs.length > 1) {
-                for (i=1; i<this.pairs.length; i++) {
-                    const inArr = [
+                for (let i=1; i<this.pairs.length; i++) {
+                    let inArr = [
                         this.pairs[i-1][0],
                         this.pairs[i-1][1],
-                        this.pairs[i][1],
+                        // this.pairs[i][1], //[0] - (this.pairs[i][0] - this.pairs[i][1]),
+                        [
+                            this.pairs[i][0][0] - (this.pairs[i][1][0] - this.pairs[i][0][0]),
+                            this.pairs[i][0][1] - (this.pairs[i][1][1] - this.pairs[i][0][1])
+                        ],
                         this.pairs[i][0]
                     ]
-                    for (t=0; t<=1; t+=0.2) { // resolution = 5 for now
+                    c.beginPath()
+                    c.moveTo(inArr[0][0], inArr[0][1])
+
+                    const copyArr = [inArr[0], inArr[1], inArr[2], inArr[3]]
+                    for (let t=0; t<=1; t+=(1/50)) { // resolution = 50 for now
                         while (inArr.length > 1) {
-                            for (j=1; j<inArr.length; j++) {
-                                let vec = getVector(inArr[j-1], inArr[j])
-                                vec = scale(vec, t)
-                                inArr[j-1] = addVector(inArr[j-1], vec)
+                            for (let j=1; j<inArr.length; j++) {
+                                let vec = VM.get(inArr[j-1], inArr[j])
+                                vec = VM.scale(vec, t)
+                                inArr[j-1] = VM.add(inArr[j-1], vec)
                             }
-                            inArr.pop()
+                            inArr = inArr.slice(0, inArr.length-1)
                         }
-                        // final point yaaay?
+                        c.lineTo(inArr[0][0], inArr[0][1])
+
+                        inArr = copyArr
                     }
+                    c.stroke()
                 }
             }
             //
