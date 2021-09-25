@@ -143,27 +143,28 @@ let rightclicked = false
  *          create new spline using constructor
  */
 addEventListener("mousedown", e => {
-    let pointFound = false
-    splines.forEach((spline, i) => {
-        spline.pairs.forEach((pair, j) => {
-            pair.forEach((point, k) => {
-                distance = Math.abs(Math.hypot((e.clientX - point[0]), (e.clientX - point[1])))
-                if (distance < 10) {
-                    pointFound = true
-                    mode = ['movePoint', i, j, k]
-                }
+    if (!activeSpline) {
+        let pointFound = false
+        splines.forEach((spline, i) => {
+            spline.pairs.forEach((pair, j) => {
+                pair.forEach((point, k) => {
+                    distance = Math.abs(Math.hypot((e.clientX - point[0]), (e.clientX - point[1])))
+                    if (distance < 10) {
+                        pointFound = true
+                        mode = ['movePoint', i, j, k]
+                    }
+                })
             })
         })
-    })
-
-    if (!pointFound) {
-        if (!activeSpline) {
+        if (!pointFound) {
             splines.push(new Spline())
             activeSpline = true
         }
+    }
+    if (activeSpline) {
         splines[splines.length-1].addPair(e.clientX, e.clientY)
     }
-});
+})
 
 
 /**On rightClick:
