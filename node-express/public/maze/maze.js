@@ -3,6 +3,17 @@ const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+// canvas framerate detection
+let lastRender = Date.now()
+let delta
+function render() {
+    delta = Date.now() - lastRender
+    lastRender = Date.now()
+    requestAnimationFrame(render)
+}
+render()
+//
+
 Array.prototype.shuffle = function() { // imported this function
     let currentIndex = this.length, randomIndex
 
@@ -240,7 +251,7 @@ class Player {
 
     update() {
         if (this.moveLog.length > 0) {
-            this.moveLog[0].t++ // increment first move
+            this.moveLog[0].t += (delta / 15 + 0.67) // increment first move
 
             if (this.moveLog[0].t > maxTime) {
                 this.moveLog.splice(0, 1)
