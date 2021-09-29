@@ -350,6 +350,13 @@ addEventListener('mousedown', (pos) => {
     })
 })
 
-// addEventListener('touchstart', (pos) => {
-//     click(pos)
-// })
+addEventListener('touchstart', (event) => {
+    event.preventDefault()
+    cfg.vis.showBeziers = (cfg.vis.showBeziers) ? false : true
+    cfg.vis.showSplines = (cfg.vis.showSplines) ? false : true
+
+    click({
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
+    })
+})
