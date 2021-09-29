@@ -331,7 +331,7 @@ addEventListener('mousemove', (pos) => {
 })
 
 // bubble click
-addEventListener('mousedown', (pos) => {
+function click(pos) {
     bubbles.forEach(bubble => {
         const dist = Math.hypot(bubble.pos.x - pos.clientX, bubble.pos.y - pos.clientY)
         if (dist < bubble.radius) {
@@ -341,4 +341,12 @@ addEventListener('mousedown', (pos) => {
             }
         }
     })
+}
+
+addEventListener('mousedown', (pos) => {
+    click(pos)
+})
+
+addEventListener('touchstart', (pos) => {
+    click(pos)
 })
