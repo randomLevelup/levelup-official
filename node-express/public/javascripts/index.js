@@ -331,9 +331,9 @@ addEventListener('mousemove', (pos) => {
 })
 
 // bubble click
-function click(pos) {
+function click(clickPos) {
     bubbles.forEach(bubble => {
-        const dist = Math.hypot(bubble.pos.x - pos.clientX, bubble.pos.y - pos.clientY)
+        const dist = Math.hypot(bubble.pos.x - clickPos.x, bubble.pos.y - clickPos.y)
         if (dist < bubble.radius) {
             if (bubble.linkExt != 'none') {
                 const linkTo = '../' + bubble.linkExt + '.html'
@@ -344,9 +344,12 @@ function click(pos) {
 }
 
 addEventListener('mousedown', (pos) => {
-    click(pos)
+    click({
+        x: pos.clientX,
+        y: pos.clientY
+    })
 })
 
-addEventListener('touchstart', (pos) => {
-    click(pos)
-})
+// addEventListener('touchstart', (pos) => {
+//     click(pos)
+// })
