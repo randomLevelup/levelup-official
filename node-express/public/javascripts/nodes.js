@@ -1,19 +1,25 @@
+const canvas = document.querySelector('canvas')
+const c = canvas.getContext('2d')
+
+canvas.width = innerWidth
+canvas.height = innerHeight
+
 const cfg = {
     nodeData: {
     color: "#FEDDBE",
-    radius: 8,
+    radius: Math.min(canvas.width, canvas.height) / 96,
     speed: 0.7
 },
 glowData: {
     color: "#185ADB",
-    ringWidth: 25,
+    ringWidth: Math.min(canvas.width, canvas.height) / 30.7,
     opacityMax: 0.3
 },
 lineData: {
     color: "#FEDDBE",
     opacityMult: 50,
     threshold: 0.3,
-    width: 2
+    width: Math.min(canvas.width, canvas.height) / 384
 },
 simData: {
     bgColor: "#0A1931",
@@ -21,12 +27,6 @@ simData: {
     magnetStrength: 3
 }
 }
-
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
-
-canvas.width = innerWidth
-canvas.height = innerHeight
 
 let lastFPS = Date.now()
 let delta
