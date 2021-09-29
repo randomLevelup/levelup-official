@@ -331,9 +331,9 @@ addEventListener('mousemove', (pos) => {
 })
 
 // bubble click
-function click(pos) {
+function click(clickPos) {
     bubbles.forEach(bubble => {
-        const dist = Math.hypot(bubble.pos.x - pos.clientX, bubble.pos.y - pos.clientY)
+        const dist = Math.hypot(bubble.pos.x - clickPos.x, bubble.pos.y - clickPos.x)
         if (dist < bubble.radius) {
             if (bubble.linkExt != 'none') {
                 const linkTo = '../' + bubble.linkExt + '.html'
@@ -344,9 +344,25 @@ function click(pos) {
 }
 
 addEventListener('mousedown', (pos) => {
-    click(pos)
+    click({
+        x: pos.clientX,
+        y: pos.clientY
+    })
 })
 
-addEventListener('touchstart', (pos) => {
-    click(pos)
-})
+// function getTouchPos(canvasDom, touchEvent) { // mobile touch support - not my code
+//     var rect = canvasDom.getBoundingClientRect()
+//     return {
+//       x: touchEvent.touches[0].clientX - rect.left,
+//       y: touchEvent.touches[0].clientY - rect.top
+//     }
+// }
+
+// addEventListener('touchstart', (event) => {
+//     event.preventDefault()
+//     showBeziers = true
+//     showSplines = true
+
+//     touchPos = getTouchPos(c, event)
+//     click(touchPos)
+// })
