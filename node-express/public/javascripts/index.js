@@ -3,6 +3,7 @@ const c = canvas.getContext('2d')
 
 canvas.width = innerWidth
 canvas.height = innerHeight
+
 const tPi = 2 * Math.PI
 
 const cfg = {
@@ -12,7 +13,15 @@ const cfg = {
         spraySpeed: 1,
     },
     size: {
+        // bubbleT: 1.2 * (canvas.width / canvas.height) - 2.1,
+        radScale: Math.min(canvas.width, canvas.height),
 
+        bubbleT: 0,
+        globalS: 80,
+        originPos: {
+            x: Math.min(canvas.width, canvas.height) / 3.4,
+            y: Math.min(canvas.width, canvas.height) / 3.4
+        },
     },
     vis: {
         showBeziers: false,
@@ -142,7 +151,8 @@ class Bubble { // large bubble class
 }
 class Spray extends Bubble {
     constructor(x) {
-        super(x, canvas.height + 10, 10)
+        const radius = cfg.size.radScale / 75
+        super(x, canvas.height + radius, radius)
         this.vel = {
             x: 0,
             y: 0
@@ -162,7 +172,7 @@ class Spray extends Bubble {
         // collision detection
         bubbles.forEach(bubble => {
             let dist = Math.hypot(bubble.pos.x - this.pos.x, bubble.pos.y - this.pos.y)
-            dist -= (bubble.radius + 10)
+            dist -= (bubble.radius + (cfg.size.radScale / 75))
             if (dist <= 0) {
                 const v = this.vel
                 const n = this.getNormal(bubble)
@@ -185,7 +195,7 @@ class Spray extends Bubble {
         
         // pop surfaced bubbles
         if (!this.trash) {
-            if (this.pos.y < -20) {
+            if (this.pos.y < -2 * (cfg.size.radScale / 108)) {
                 this.trash = true
             }
         }
@@ -197,16 +207,18 @@ class Spray extends Bubble {
 
 class Terrain {
     constructor(yLevel, fillColor) {
+        const s = cfg.size.radScale
+
         this.fillColor = fillColor
-        this.startPoint = {x: -10, y: yLevel, amp: 50}
+        this.startPoint = {x: -10, y: yLevel, amp: (s / 21.6)}
         this.extrema = [this.startPoint]
         let pen = {x: this.startPoint.x, y: this.startPoint.y, amp: this.startPoint.amp}
         const minMax = [-1, 1]
         let ticker = 0
         while (pen.x < canvas.width) { // generate terrain extrema
-            pen.x += 100 + (Math.random() * 150)
-            pen.y += (minMax[ticker % 2]) * (10 + (Math.random() * 50))
-            pen.amp = 50 + (Math.random() * 50)
+            pen.x += (s / 7.5) + (Math.random() * (s / 6.9))
+            pen.y += (minMax[ticker % 2]) * ((s / 75) + (Math.random() * (s / 18.6)))
+            pen.amp = (s / 18.6) + (Math.random() * (s / 21.6))
             this.extrema.push({x: pen.x, y: pen.y, amp: pen.amp})
             ticker++
         }
@@ -251,8 +263,15 @@ class Terrain {
     }
 }
 
-function addBubble(x, y, radius, imgSrc, linkExt) {
-    const bubbleToCreate = new Bubble(x, y, radius, imgSrc, linkExt)
+function addBubble(tPlus, scalar, radius, imgSrc, linkExt) {
+    const lib = cfg.size
+    const bPos = {
+        x: (scalar * lib.globalS) * Math.cos(lib.bubbleT + tPlus) + lib.originPos.x,
+        y: (scalar * lib.globalS) * Math.sin(lib.bubbleT + tPlus) + lib.originPos.y
+    }
+    const newRadius = radius * (lib.radScale / 9)
+
+    const bubbleToCreate = new Bubble(bPos.x, bPos.y, newRadius, imgSrc, linkExt)
     bubbles.push(bubbleToCreate)
 }
 function addSpray(x) {
@@ -299,14 +318,14 @@ function animate() { // animation loop
 }
 
 // init sequence
-addBubble(270, 200, 130, 'aboutSource', 'about')
-addBubble(750, 300, 80, 'mazeSource', 'maze')
-addBubble(1000, 390, 80, 'physicsSource', 'bouncy')
-addBubble(500, 450, 80, 'nodesSource', 'nodes')
-addBubble(1200, 250, 80, 'splinesSource', 'spline')
-const terrF = new Terrain(650, '#18618C')
-const terrM = new Terrain(500, '#0F8AB4')
-const terrB = new Terrain(350, '#2FA5C9')
+addBubble(0, 0, 1.8, 'aboutSource', 'about')
+addBubble(0.7, 4, 1, 'mazeSource', 'maze')
+addBubble(0.3, 7, 1, 'physicsSource', 'bouncy')
+addBubble(0.1, 10, 1, 'nodesSource', 'nodes')
+addBubble(0.2, 13, 1, 'splinesSource', 'spline')
+const terrF = new Terrain((canvas.height / 1.2), '#18618C')
+const terrM = new Terrain((canvas.height / 1.6), '#0F8AB4')
+const terrB = new Terrain((canvas.height / 3.09), '#2FA5C9')
 
 animate()
 
