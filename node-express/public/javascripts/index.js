@@ -13,14 +13,12 @@ const cfg = {
         spraySpeed: 1,
     },
     size: {
-        // bubbleT: 1.2 * (canvas.width / canvas.height) - 2.1,
-        radScale: Math.min(canvas.width, canvas.height),
-
-        bubbleT: 0,
-        globalS: 80,
+        radScale: Math.max(canvas.width, canvas.height),
+        bubbleT: 0.45 * ((2.1 - (canvas.width / canvas.height)) ** 2),
+        globalS: 0.058,
         originPos: {
-            x: Math.min(canvas.width, canvas.height) / 3.4,
-            y: Math.min(canvas.width, canvas.height) / 3.4
+            x: Math.max(canvas.width, canvas.height) / 7,
+            y: Math.max(canvas.width, canvas.height) / 7
         },
     },
     vis: {
@@ -28,6 +26,8 @@ const cfg = {
         showSplines: false
     }
 }
+console.log(canvas.width / canvas.height)
+console.log(cfg.size.bubbleT)
 
 let lastFPS = Date.now()
 let delta
@@ -151,7 +151,7 @@ class Bubble { // large bubble class
 }
 class Spray extends Bubble {
     constructor(x) {
-        const radius = cfg.size.radScale / 75
+        const radius = cfg.size.radScale / 130
         super(x, canvas.height + radius, radius)
         this.vel = {
             x: 0,
@@ -172,7 +172,7 @@ class Spray extends Bubble {
         // collision detection
         bubbles.forEach(bubble => {
             let dist = Math.hypot(bubble.pos.x - this.pos.x, bubble.pos.y - this.pos.y)
-            dist -= (bubble.radius + (cfg.size.radScale / 75))
+            dist -= (bubble.radius + (cfg.size.radScale / 140))
             if (dist <= 0) {
                 const v = this.vel
                 const n = this.getNormal(bubble)
@@ -195,7 +195,7 @@ class Spray extends Bubble {
         
         // pop surfaced bubbles
         if (!this.trash) {
-            if (this.pos.y < -2 * (cfg.size.radScale / 108)) {
+            if (this.pos.y < -2 * (cfg.size.radScale / 190)) {
                 this.trash = true
             }
         }
@@ -210,15 +210,15 @@ class Terrain {
         const s = cfg.size.radScale
 
         this.fillColor = fillColor
-        this.startPoint = {x: -10, y: yLevel, amp: (s / 21.6)}
+        this.startPoint = {x: -10, y: yLevel, amp: (s / 35)}
         this.extrema = [this.startPoint]
         let pen = {x: this.startPoint.x, y: this.startPoint.y, amp: this.startPoint.amp}
         const minMax = [-1, 1]
         let ticker = 0
         while (pen.x < canvas.width) { // generate terrain extrema
-            pen.x += (s / 7.5) + (Math.random() * (s / 6.9))
-            pen.y += (minMax[ticker % 2]) * ((s / 75) + (Math.random() * (s / 18.6)))
-            pen.amp = (s / 18.6) + (Math.random() * (s / 21.6))
+            pen.x += (s / 13) + (Math.random() * (s / 12))
+            pen.y += (minMax[ticker % 2]) * ((s / 130) + (Math.random() * (s / 33)))
+            pen.amp = (s / 38) + (Math.random() * (s / 38))
             this.extrema.push({x: pen.x, y: pen.y, amp: pen.amp})
             ticker++
         }
@@ -266,10 +266,10 @@ class Terrain {
 function addBubble(tPlus, scalar, radius, imgSrc, linkExt) {
     const lib = cfg.size
     const bPos = {
-        x: (scalar * lib.globalS) * Math.cos(lib.bubbleT + tPlus) + lib.originPos.x,
-        y: (scalar * lib.globalS) * Math.sin(lib.bubbleT + tPlus) + lib.originPos.y
+        x: (scalar * lib.globalS * lib.radScale) * Math.cos(lib.bubbleT + tPlus) + lib.originPos.x,
+        y: (scalar * lib.globalS * lib.radScale) * Math.sin(lib.bubbleT + tPlus) + lib.originPos.y
     }
-    const newRadius = radius * (lib.radScale / 9)
+    const newRadius = radius * (lib.radScale / 15)
 
     const bubbleToCreate = new Bubble(bPos.x, bPos.y, newRadius, imgSrc, linkExt)
     bubbles.push(bubbleToCreate)
@@ -311,18 +311,20 @@ function animate() { // animation loop
             sprays[i].updateSpray()
         }
     }
+
+    terrF.drawFill()
+
     bubbles.forEach(bubble => {
         bubble.update() // float bubbles
     })
-    terrF.drawFill()
 }
 
 // init sequence
-addBubble(0, 0, 1.8, 'aboutSource', 'about')
-addBubble(0.7, 4, 1, 'mazeSource', 'maze')
-addBubble(0.3, 7, 1, 'physicsSource', 'bouncy')
-addBubble(0.1, 10, 1, 'nodesSource', 'nodes')
-addBubble(0.2, 13, 1, 'splinesSource', 'spline')
+addBubble(0, 0, 1.6, 'aboutSource', 'about')
+addBubble(0.7, 4, 1.05, 'mazeSource', 'maze')
+addBubble(0.3, 7, 1.05, 'physicsSource', 'bouncy')
+addBubble(0.1, 10, 1.05, 'nodesSource', 'nodes')
+addBubble(0.2, 13, 1.05, 'splinesSource', 'spline')
 const terrF = new Terrain((canvas.height / 1.2), '#18618C')
 const terrM = new Terrain((canvas.height / 1.6), '#0F8AB4')
 const terrB = new Terrain((canvas.height / 3.09), '#2FA5C9')
