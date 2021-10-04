@@ -1,3 +1,7 @@
+const LUT = [
+    // put LUT here
+]
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -11,6 +15,13 @@ class Vertex {
 
     update(value) {
         this.value = value
+    }
+
+    draw(pos, size) {
+        c.beginPath()
+        c.fillStyle = (this.value == 1) ? 'white' : 'black'
+        c.arc(pos[0], pos[1], size, 0, (2*Math.PI), false)
+        c.fill()
     }
 }
 
@@ -26,7 +37,6 @@ class Cell {
     draw(pos, size) {
         c.beginPath()
         c.fillStyle = `rgba(255, 255, 255, ${this.value / 16})`
-        console.log([pos, this.value / 16])
         c.fillRect(pos[0], pos[1], size, size)
     }
 }
@@ -80,11 +90,11 @@ class Grid {
         return(result)
     }
 
-    draw() {
-        const drawPos = [200, 170]
-        for (let i=0; i<this.cList.length; i++) {
-            for (let j=0; j<this.cList[i].length; j++) {
-                this.cList[i][j].draw([drawPos[0], drawPos[1]], 40)
+    draw(drawArr, size) {
+        let drawPos = [200, 170]
+        for (let i=0; i<drawArr.length; i++) {
+            for (let j=0; j<drawArr[i].length; j++) {
+                drawArr[i][j].draw([drawPos[0], drawPos[1]], size)
                 drawPos[1] += 40
             }
             drawPos[0] += 40
@@ -99,4 +109,5 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const grid = new Grid(10, 10)
 // grid.vList[0][3] = new Vertex(1)
 grid.updateCells()
-grid.draw()
+grid.draw(grid.cList, 40)
+grid.draw(grid.vList, 5)
