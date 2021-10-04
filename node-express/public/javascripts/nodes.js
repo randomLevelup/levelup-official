@@ -23,7 +23,8 @@ lineData: {
 simData: {
     bgColor: "#0A1931",
     spawnTime: 80,
-    magnetStrength: 3
+    magnetStrength: 3,
+    touchConst: 1
 }
 }
 
@@ -140,7 +141,7 @@ function animate() {
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     cfg.nodeData.speed = delta * 0.14
-    cfg.simData.magnetStrength = (delta * 0.47) + 0.6
+    cfg.simData.magnetStrength = ((delta * 0.47) + 0.6) * cfg.simData.touchConst
     okToSpawn = true
 
     if (nodes.length > 0) {
@@ -185,8 +186,17 @@ function animate() {
 
 const mousePos = {x: 0, y: 0}
 addEventListener('mousemove', (pos) => {
-mousePos.x = pos.clientX
-mousePos.y = pos.clientY
+    mousePos.x = pos.clientX
+    mousePos.y = pos.clientY
+    
+    cfg.simData.touchConst = 1
+})
+addEventListener('touchmove', (event) => {
+    event.preventDefault()
+    mousePos.x = event.touches[0].clientX
+    mousePos.y = event.touches[0].clientY
+
+    cfg.simData.touchConst = 3
 })
 
 setInterval(() => {
