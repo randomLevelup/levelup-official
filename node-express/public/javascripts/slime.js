@@ -1,4 +1,4 @@
-const LUT = [
+const lut = [
     [[0,0],[1,0],[1,1],[0,1]],
     [[0,0],[1,0],[1,1],[0.5,1],[0,0.5]],
     [[0,0],[1,0],[1,0.5],[0.5,1],[0,1]],
@@ -39,7 +39,7 @@ class Vertex {
 
     draw(pos, size) {
         c.beginPath()
-        c.fillStyle = (this.value == 1) ? 'white' : 'black'
+        c.fillStyle = (this.value == 1) ? 'purple' : 'yellow'
         c.arc(pos[0], pos[1], size, 0, (2*Math.PI), false)
         c.fill()
     }
@@ -54,10 +54,14 @@ class Cell {
         this.value = value
     }
 
-    draw(pos, size) {
+    static draw(pos, size, lookUp) {
+        c.fillStyle = 'white'
         c.beginPath()
-        c.fillStyle = `rgba(255, 255, 255, ${this.value / 16})`
-        c.fillRect(pos[0], pos[1], size, size)
+        c.moveTo(pos[0] + (size * lookUp[0][0]), pos[1] + (size * lookUp[0][1]))
+        for (let i=1; i<lookUp.length; i++) {
+            c.lineTo(pos[0] + (size * lookUp[i][0]), pos[1] + (size * lookUp[i][1])) 
+        }
+        c.fill()
     }
 }
 
@@ -121,6 +125,28 @@ class Grid {
             drawPos[1] = 170
         }
     }
+
+    drawCells(size) {
+        let drawPos = [200, 170]
+        for (let i=0; i<this.cList.length; i++) {
+            for (let j=0; j<this.cList.length; j++) {
+                const lookUp = lut[this.cList[i][j].value]
+                console.log(this.cList[i][j].value)
+                if (lookUp != null) {
+                    if (lookUp.length > 2) {
+                        Cell.draw(drawPos, size, lookUp)
+                    }
+                    else if (lookUp.length > 0) {
+                        Cell.draw(drawPos, size, lookUp[0])
+                        Cell.draw(drawPos, size, lookUp[1])
+                    }
+                }
+                drawPos[0] += size
+            }
+            drawPos[1] += size
+            drawPos[0] = 200
+        }
+    }
 }
 
 c.fillStyle = 'black'
@@ -129,5 +155,5 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const grid = new Grid(10, 10)
 // grid.vList[0][3] = new Vertex(1)
 grid.updateCells()
-grid.draw(grid.cList, 40)
+grid.drawCells(40)
 grid.draw(grid.vList, 5)
