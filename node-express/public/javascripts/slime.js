@@ -19,6 +19,7 @@ const lut = [
     [[0.5,0],[1,0],[1,0.5]],
     [[0,0.5],[1,0.5],[1,1],[0,1]],
     [[1,0.5],[1,1],[0.5,1]],
+    [[0.5,1],[0,1],[0,0.5]],
     []
 ]
 
@@ -72,6 +73,7 @@ class Grid {
             const newRow = []
             for (let j=0; j<sizeX; j++) {
                 newRow.push(new Vertex(Math.floor(Math.random() * 2)))
+                // newRow.push(new Vertex(1))
             }
             this.vList.push(newRow) // push the new rows into grid
         }
@@ -114,20 +116,20 @@ class Grid {
         return(result)
     }
 
-    draw(drawArr, size) {
-        let drawPos = [200, 170]
+    drawDots(drawArr, radius) {
+        let drawPos = [0, 0]
         for (let i=0; i<drawArr.length; i++) {
             for (let j=0; j<drawArr[i].length; j++) {
-                drawArr[i][j].draw([drawPos[0], drawPos[1]], size)
-                drawPos[1] += 40
+                drawArr[j][i].draw([drawPos[0], drawPos[1]], radius)
+                drawPos[1] += 20
             }
-            drawPos[0] += 40
-            drawPos[1] = 170
+            drawPos[0] += 20
+            drawPos[1] = 0
         }
     }
 
     drawCells(size) {
-        let drawPos = [200, 170]
+        let drawPos = [0, 0]
         for (let i=0; i<this.cList.length; i++) {
             for (let j=0; j<this.cList.length; j++) {
                 const lookUp = lut[this.cList[i][j].value]
@@ -144,7 +146,7 @@ class Grid {
                 drawPos[0] += size
             }
             drawPos[1] += size
-            drawPos[0] = 200
+            drawPos[0] = 0
         }
     }
 }
@@ -152,8 +154,15 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const grid = new Grid(10, 10)
-// grid.vList[0][3] = new Vertex(1)
+const resolution = 20
+const grid = new Grid(
+    (Math.max(canvas.width, canvas.height) / resolution)+1,
+    (Math.max(canvas.width, canvas.height) / resolution)+1,
+)
+
+// grid.vList[1][1].value = 0
+// grid.vList[1][2].value = 0
+
 grid.updateCells()
-grid.drawCells(40)
-grid.draw(grid.vList, 5)
+grid.drawCells(resolution)
+grid.drawDots(grid.vList, 4)
