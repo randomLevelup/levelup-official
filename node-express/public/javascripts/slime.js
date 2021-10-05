@@ -29,6 +29,14 @@ const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+function getWorldPos(row, col) {
+    const result = {
+        x: col * resolution,
+        y: row * resolution
+    }
+    return(result)
+}
+
 class Vertex {
     constructor(value) {
         this.value = value
@@ -72,8 +80,8 @@ class Grid {
         for (let i=0; i<sizeY; i++) {
             const newRow = []
             for (let j=0; j<sizeX; j++) {
-                newRow.push(new Vertex(Math.floor(Math.random() * 2)))
-                // newRow.push(new Vertex(1))
+                // newRow.push(new Vertex(Math.floor(Math.random() * 2)))
+                newRow.push(new Vertex(1))
             }
             this.vList.push(newRow) // push the new rows into grid
         }
@@ -87,6 +95,21 @@ class Grid {
             this.cList.push(newRow)
         }
         this.updateCells()
+    }
+
+    updateVerts() {
+        for (let i=0; i<this.vList.length; i++) {
+            for (let j=0; j<this.vList[i].length; j++) {
+                const worldPos = getWorldPos(i, j)
+                const distance = Math.hypot(
+                    worldPos.x - mousePos.x,
+                    worldPos.y - mousePos.y
+                )
+                if (distance < 20) {
+                    this.vList[i][j].value = 0
+                }
+            }
+        }
     }
 
     isolate() {
@@ -133,7 +156,6 @@ class Grid {
         for (let i=0; i<this.cList.length; i++) {
             for (let j=0; j<this.cList.length; j++) {
                 const lookUp = lut[this.cList[i][j].value]
-                console.log(this.cList[i][j].value)
                 if (lookUp != null) {
                     if (lookUp.length > 2) {
                         Cell.draw(drawPos, size, lookUp)
@@ -156,13 +178,38 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const resolution = 20
 const grid = new Grid(
-    (Math.max(canvas.width, canvas.height) / resolution)+1,
-    (Math.max(canvas.width, canvas.height) / resolution)+1,
+    (Math.max(canvas.width, canvas.height) / resolution) + 1,
+    (Math.max(canvas.width, canvas.height) / resolution) + 1,
 )
 
 // grid.vList[1][1].value = 0
 // grid.vList[1][2].value = 0
 
-grid.updateCells()
-grid.drawCells(resolution)
-grid.drawDots(grid.vList, 4)
+
+function animate() {
+    requestAnimationFrame(animate)
+    c.fillStyle = 'black'
+    c.fillRect(0, 0, canvas.width, canvas.height)
+    
+    if (mode == 'down') {
+        grid.updateVerts()
+    }
+    grid.updateCells()
+    grid.drawCells(resolution)
+    grid.drawDots(grid.vList, 1)
+}
+
+const mousePos = {x: -1, y: -1}
+addEventListener('mousemove', (evt) => {
+    mousePos.x = evt.clientX
+    mousePos.y = evt.clientY
+})
+let mode = 'up'
+addEventListener('mousedown', (evt) => {
+    mode = 'down'
+})
+addEventListener('mouseup', (evt) => {
+    mode = 'up'
+})
+
+animate()
