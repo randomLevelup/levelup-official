@@ -144,9 +144,9 @@ class Grid {
         for (let i=0; i<drawArr.length; i++) {
             for (let j=0; j<drawArr[i].length; j++) {
                 drawArr[j][i].draw([drawPos[0], drawPos[1]], radius)
-                drawPos[1] += 20
+                drawPos[1] += resolution
             }
-            drawPos[0] += 20
+            drawPos[0] += resolution
             drawPos[1] = 0
         }
     }
@@ -176,7 +176,7 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 20
+const resolution = 10
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
