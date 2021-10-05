@@ -40,15 +40,19 @@ function getWorldPos(row, col) {
 class Vertex {
     constructor(value) {
         this.value = value
+        this.iso = 1
     }
 
-    update(value) {
-        this.value = value
+    clamp(threshold) {
+        // this.iso = (this.value < threshold) ? 0 : 1
+        if (this.value < threshold) {
+            this.iso = 0
+        }
     }
 
     draw(pos, size) {
         c.beginPath()
-        c.fillStyle = (this.value == 1) ? 'purple' : 'yellow'
+        c.fillStyle = (this.iso == 1) ? 'purple' : 'yellow'
         c.arc(pos[0], pos[1], size, 0, (2*Math.PI), false)
         c.fill()
     }
@@ -56,10 +60,6 @@ class Vertex {
 
 class Cell {
     constructor(value) {
-        this.value = value
-    }
-
-    update(value) {
         this.value = value
     }
 
@@ -101,13 +101,11 @@ class Grid {
         for (let i=0; i<this.vList.length; i++) {
             for (let j=0; j<this.vList[i].length; j++) {
                 const worldPos = getWorldPos(i, j)
-                const distance = Math.hypot(
+                this.vList[i][j].value = Math.hypot(
                     worldPos.x - mousePos.x,
                     worldPos.y - mousePos.y
                 )
-                if (distance < 20) {
-                    this.vList[i][j].value = 0
-                }
+                this.vList[i][j].clamp(40)
             }
         }
     }
@@ -122,9 +120,9 @@ class Grid {
                 let lutTotal = 0
                 this.getVertices(i, j).forEach((v, i) => {
                     // this method 'marches' around the square to get a LUT case int
-                    lutTotal += (v.value * (2 ** i))
+                    lutTotal += (v.iso * (2 ** i))
                 })
-                this.cList[i][j].update(lutTotal)
+                this.cList[i][j].value = lutTotal
             }
         }
     }
