@@ -52,8 +52,12 @@ class Vertex {
 
     draw(pos, size) {
         c.beginPath()
-        c.fillStyle = (this.iso == 1) ? 'purple' : 'yellow'
         c.arc(pos[0], pos[1], size, 0, (2*Math.PI), false)
+
+        c.fillStyle = 'rgb(0,255,255)'
+        c.fill()
+
+        c.fillStyle = `rgba(255,0,255,${this.value / 200})`
         c.fill()
     }
 }
@@ -81,7 +85,7 @@ class Grid {
             const newRow = []
             for (let j=0; j<sizeX; j++) {
                 // newRow.push(new Vertex(Math.floor(Math.random() * 2)))
-                newRow.push(new Vertex(1))
+                newRow.push(new Vertex(200))
             }
             this.vList.push(newRow) // push the new rows into grid
         }
@@ -105,7 +109,7 @@ class Grid {
                     worldPos.x - mousePos.x,
                     worldPos.y - mousePos.y
                 )
-                this.vList[i][j].clamp(40)
+                this.vList[i][j].clamp(60)
             }
         }
     }
@@ -174,7 +178,7 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 10
+const resolution = 40
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
@@ -194,7 +198,7 @@ function animate() {
     }
     grid.updateCells()
     grid.drawCells(resolution)
-    grid.drawDots(grid.vList, 1)
+    grid.drawDots(grid.vList, 4)
 }
 
 const mousePos = {x: -1, y: -1}
