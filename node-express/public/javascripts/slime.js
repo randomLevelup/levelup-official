@@ -44,10 +44,10 @@ class Vertex {
     }
 
     clamp(threshold) {
-        // this.iso = (this.value < threshold) ? 0 : 1
-        if (this.value < threshold) {
-            this.iso = 0
-        }
+        this.iso = (this.value < threshold) ? 0 : 1 // this will use active vertex points
+        // if (this.value < threshold) { // this will draw constant iso values
+        //     this.iso = 0
+        // }
     }
 
     draw(pos, size) {
@@ -109,7 +109,7 @@ class Grid {
                     worldPos.x - mousePos.x,
                     worldPos.y - mousePos.y
                 )
-                this.vList[i][j].clamp(60)
+                this.vList[i][j].clamp(75)
             }
         }
     }
@@ -141,11 +141,11 @@ class Grid {
         return(result)
     }
 
-    drawDots(drawArr, radius) {
+    drawDots(radius) {
         let drawPos = [0, 0]
-        for (let i=0; i<drawArr.length; i++) {
-            for (let j=0; j<drawArr[i].length; j++) {
-                drawArr[j][i].draw([drawPos[0], drawPos[1]], radius)
+        for (let i=0; i<this.vList.length; i++) {
+            for (let j=0; j<this.vList[i].length; j++) {
+                this.vList[j][i].draw([drawPos[0], drawPos[1]], radius)
                 drawPos[1] += resolution
             }
             drawPos[0] += resolution
@@ -178,7 +178,7 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 40
+const resolution = 20
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
@@ -187,18 +187,18 @@ const grid = new Grid(
 // grid.vList[1][1].value = 0
 // grid.vList[1][2].value = 0
 
-
 function animate() {
     requestAnimationFrame(animate)
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
-    
+
     if (mode == 'down') {
         grid.updateVerts()
+        grid.updateCells()
     }
-    grid.updateCells()
+
     grid.drawCells(resolution)
-    grid.drawDots(grid.vList, 4)
+    grid.drawDots(2)
 }
 
 const mousePos = {x: -1, y: -1}
