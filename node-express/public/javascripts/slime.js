@@ -37,8 +37,10 @@ function getWorldPos(row, col) {
     return(result)
 }
 
-function lutify(value, corners) {
-    
+function interpolate(c1, c2) { // something funky is going on
+    const diff = c2 - c1
+    console.log((diff / (resolution * 2)) + 0.5)
+    return (diff / (resolution * 2)) + 0.5
 }
 
 class Vertex {
@@ -71,13 +73,21 @@ class Cell {
         this.value = value
     }
 
-    static draw(pos, size, lookUp) {
+    static draw(pos, size, lookUp, corners) {
         for (let i=0; i<lookUp.length; i++) {
             for (let j=0; j<lookUp[i].length; j++) {
-                if (lookUp[i][j] == 'n') {lookUp[i][j] = 0.5}
-                else if (lookUp[i][j] == 'e') {lookUp[i][j] = 0.5}
-                else if (lookUp[i][j] == 's') {lookUp[i][j] = 0.5}
-                else if (lookUp[i][j] == 'w') {lookUp[i][j] = 0.5}
+                if (lookUp[i][j] == 'n') {
+                    lookUp[i][j] = interpolate(corners[3].value, corners[2].value)
+                }
+                else if (lookUp[i][j] == 'e') {
+                    lookUp[i][j] = interpolate(corners[2].value, corners[1].value)
+                }
+                else if (lookUp[i][j] == 's') {
+                    lookUp[i][j] = interpolate(corners[0].value, corners[1].value)
+                }
+                else if (lookUp[i][j] == 'w') {
+                    lookUp[i][j] = interpolate(corners[3].value, corners[0].value)
+                }
             }
         }
 
@@ -127,10 +137,6 @@ class Grid {
         }
     }
 
-    isolate() {
-        // dont need this function until vertexs weights are implemented
-    }
-
     updateCells() {
         for (let i=0; i<this.cList.length; i++) {
             for (let j=0; j<this.cList[i].length; j++) {
@@ -171,13 +177,14 @@ class Grid {
         for (let i=0; i<this.cList.length; i++) {
             for (let j=0; j<this.cList.length; j++) {
                 const lookUp = lut[this.cList[i][j].value]
+                const corners = this.getVertices(i, j)
                 if (lookUp != null) {
                     if (lookUp.length > 2) {
-                        Cell.draw(drawPos, size, lookUp)
+                        Cell.draw(drawPos, size, lookUp, corners)
                     }
                     else if (lookUp.length > 0) {
-                        Cell.draw(drawPos, size, lookUp[0])
-                        Cell.draw(drawPos, size, lookUp[1])
+                        Cell.draw(drawPos, size, lookUp[0], corners)
+                        Cell.draw(drawPos, size, lookUp[1], corners)
                     }
                 }
                 drawPos[0] += size
@@ -191,7 +198,7 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 20 // SET RESOLUTION!!!!
+const resolution = 40 // SET RESOLUTION!!!!
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
