@@ -1,25 +1,25 @@
 const lut = [
     [[0,0],[1,0],[1,1],[0,1]],
-    [[0,0],[1,0],[1,1],[0.5,1],[0,0.5]],
-    [[0,0],[1,0],[1,0.5],[0.5,1],[0,1]],
-    [[0,0],[1,0],[1,0.5],[0,0.5]],
-    [[0,0],[0.5,0],[1,0.5],[1,1],[0,1]],
+    [[0,0],[1,0],[1,1],['s',1],[0,'w']],
+    [[0,0],[1,0],[1,'e'],['s',1],[0,1]],
+    [[0,0],[1,0],[1,'e'],[0,'w']],
+    [[0,0],['n',0],[1,'e'],[1,1],[0,1]],
     [
-        [[0,0],[0.5,0],[0,0.5]],
-        [[1,0.5],[1,1],[0.5,1]]
+        [[0,0],['n',0],[0,'w']],
+        [[1,'e'],[1,1],['s',1]]
     ],
-    [[0,0],[0.5,0],[0.5,1],[0,1]],
-    [[0,0],[0.5,0],[0,0.5]],
-    [[0.5,0],[1,0],[1,1],[0,1],[0,0.5]],
-    [[0.5,0],[1,0],[1,1],[0.5,1]],
+    [[0,0],['n',0],['s',1],[0,1]],
+    [[0,0],['n',0],[0,'w']],
+    [['n',0],[1,0],[1,1],[0,1],[0,'w']],
+    [['n',0],[1,0],[1,1],['s',1]],
     [
-        [[0.5,0],[1,0],[1,0.5]],
-        [[0.5,1],[0,1],[0,0.5]]
+        [['n',0],[1,0],[1,'e']],
+        [['s',1],[0,1],[0,'w']]
     ],
-    [[0.5,0],[1,0],[1,0.5]],
-    [[0,0.5],[1,0.5],[1,1],[0,1]],
-    [[1,0.5],[1,1],[0.5,1]],
-    [[0.5,1],[0,1],[0,0.5]],
+    [['n',0],[1,0],[1,'e']],
+    [[0,'w'],[1,'e'],[1,1],[0,1]],
+    [[1,'e'],[1,1],['s',1]],
+    [['s',1],[0,1],[0,'w']],
     []
 ]
 
@@ -35,6 +35,10 @@ function getWorldPos(row, col) {
         y: row * resolution
     }
     return(result)
+}
+
+function lutify(value, corners) {
+    
 }
 
 class Vertex {
@@ -68,6 +72,15 @@ class Cell {
     }
 
     static draw(pos, size, lookUp) {
+        for (let i=0; i<lookUp.length; i++) {
+            for (let j=0; j<lookUp[i].length; j++) {
+                if (lookUp[i][j] == 'n') {lookUp[i][j] = 0.5}
+                else if (lookUp[i][j] == 'e') {lookUp[i][j] = 0.5}
+                else if (lookUp[i][j] == 's') {lookUp[i][j] = 0.5}
+                else if (lookUp[i][j] == 'w') {lookUp[i][j] = 0.5}
+            }
+        }
+
         c.fillStyle = 'white'
         c.beginPath()
         c.moveTo(pos[0] + (size * lookUp[0][0]), pos[1] + (size * lookUp[0][1]))
@@ -178,7 +191,7 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 20
+const resolution = 20 // SET RESOLUTION!!!!
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
@@ -198,7 +211,7 @@ function animate() {
     }
 
     grid.drawCells(resolution)
-    grid.drawDots(2)
+    grid.drawDots(2) // SET DEBUG DOT SIZE!!!
 }
 
 const mousePos = {x: -1, y: -1}
