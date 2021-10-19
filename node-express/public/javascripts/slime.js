@@ -1,4 +1,4 @@
-const lut = [
+let lut = [
     [[0,0],[1,0],[1,1],[0,1]],
     [[0,0],[1,0],[1,1],['s',1],[0,'w']],
     [[0,0],[1,0],[1,'e'],['s',1],[0,1]],
@@ -39,8 +39,23 @@ function getWorldPos(row, col) {
 
 function interpolate(c1, c2) { // something funky is going on
     const diff = c2 - c1
-    console.log((diff / (resolution * 2)) + 0.5)
     return (diff / (resolution * 2)) + 0.5
+
+}
+
+function deepCopyFunction(inObject) { // imported this function
+    let outObject, value, key
+    if (typeof inObject !== "object" || inObject === null) {
+        return inObject // Return the value if inObject is not an object
+    }
+    // Create an array or object to hold the values
+    outObject = Array.isArray(inObject) ? [] : {}
+    for (key in inObject) {
+        value = inObject[key]
+        // Recursively (deep) copy for nested objects, including arrays
+        outObject[key] = deepCopyFunction(value)
+    }
+    return outObject
 }
 
 class Vertex {
@@ -90,7 +105,6 @@ class Cell {
                 }
             }
         }
-
         c.fillStyle = 'white'
         c.beginPath()
         c.moveTo(pos[0] + (size * lookUp[0][0]), pos[1] + (size * lookUp[0][1]))
@@ -176,7 +190,8 @@ class Grid {
         let drawPos = [0, 0]
         for (let i=0; i<this.cList.length; i++) {
             for (let j=0; j<this.cList.length; j++) {
-                const lookUp = lut[this.cList[i][j].value]
+                const lookUp = deepCopyFunction(lut[this.cList[i][j].value])
+                
                 const corners = this.getVertices(i, j)
                 if (lookUp != null) {
                     if (lookUp.length > 2) {
@@ -198,7 +213,7 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 40 // SET RESOLUTION!!!!
+const resolution = 120 // SET RESOLUTION!!!!
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
@@ -207,18 +222,22 @@ const grid = new Grid(
 // grid.vList[1][1].value = 0
 // grid.vList[1][2].value = 0
 
-function animate() {
-    requestAnimationFrame(animate)
+function drawScreen() {
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
+    grid.updateVerts()
+    grid.updateCells()
+    grid.drawCells(resolution)
+    grid.drawDots(3) // SET DEBUG DOT SIZE!!!
+}
+
+function animate() {
+    requestAnimationFrame(animate)
     if (mode == 'down') {
-        grid.updateVerts()
-        grid.updateCells()
+        drawScreen()
     }
 
-    grid.drawCells(resolution)
-    grid.drawDots(2) // SET DEBUG DOT SIZE!!!
 }
 
 const mousePos = {x: -1, y: -1}
@@ -234,4 +253,5 @@ addEventListener('mouseup', (evt) => {
     mode = 'up'
 })
 
+drawScreen()
 animate()
