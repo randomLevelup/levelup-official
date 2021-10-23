@@ -59,9 +59,50 @@ function deepCopyFunction(inObject) { // imported this function
 }
 
 class Ball {
-    constructor(x, y, radius) {
-        
+    constructor(x, y, radius, vel) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+
+        const theta = Math.random() * (2 * Math.PI)
+        this.velX = Math.cos(theta) * vel
+        this.velY = Math.sin(theta) * vel
     }
+    update() {
+        if (this.x + this.radius > canvas.width) {
+            this.velX *= -1
+        }
+        if (this.x - this.radius < 0) {
+            this.velX *= -1
+        }
+        if (this.y + this.radius > canvas.height) {
+            this.velY *= -1
+        }
+        if (this.y - this.radius < 0) {
+            this.velY *= -1
+        }
+
+        this.x += this.velX
+        this.y += this.velY
+    }
+    draw() {
+        c.strokeStyle = 'red'
+        c.lineWidth = 2
+        c.beginPath()
+        c.arc(this.x, this.y, this.radius, 0, (2*Math.PI), false)
+        c.stroke()
+    }
+}
+
+function fillBalls(minRad, maxRad, vel, amt) {
+    const result = []
+    for (let i=0; i<=amt; i++) {
+        const rad = minRad + (Math.random() * (maxRad - minRad))
+        const xPos = rad + (Math.random() * canvas.width - (2 * rad))
+        const yPos = rad + (Math.random() * canvas.height - (2 * rad))
+        result.push(new Ball(xPos, yPos, rad, vel))
+    }
+    return result
 }
 
 class Vertex {
@@ -148,9 +189,15 @@ class Grid {
         for (let i=0; i<this.vList.length; i++) {
             for (let j=0; j<this.vList[i].length; j++) {
                 const worldPos = getWorldPos(i, j)
-                this.vList[i][j].value = Math.hypot(
-                    // CHECK DISTANCE FROM EVERY BALL
-                )
+                this.vList[i][j].value = 0
+                balls.forEach(ball => {
+                    const dist = Math.hypot(
+                        // CHECK DISTANCE FROM EVERY BALL
+                        worldPos.x - ball.x,
+                        worldPos.y - ball.y
+                    )
+                    this.vList[i][j].value += Math.E ** ((((0.00003 * ball.radius) - 0.0115) * dist) + 5.3)
+                })
                 this.vList[i][j].clamp(75)
             }
         }
@@ -218,34 +265,24 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 120 // SET RESOLUTION!!!!
+const resolution = 30 // SET RESOLUTION!!!!
+const balls = fillBalls(50, 200, 2, 4)
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
 )
-
-// grid.vList[1][1].value = 0
-// grid.vList[1][2].value = 0
-
-function drawScreen() {
-    c.fillStyle = 'black'
-    c.fillRect(0, 0, canvas.width, canvas.height)
-
-    grid.updateVerts()
-    grid.updateCells()
-    grid.drawCells(resolution)
-    grid.drawDots(3) // SET DEBUG DOT SIZE!!!
-}
 
 function animate() {
     requestAnimationFrame(animate)
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
+    balls.forEach(ball => {ball.update()})
+    balls.forEach(ball => {ball.draw()})
     grid.updateVerts()
     grid.updateCells()
     grid.drawCells(resolution)
-    grid.drawDots(3) // SET DEBUG DOT SIZE!!!
+    grid.drawDots(2) // SET DEBUG DOT SIZE!!!
 }
 
 animate()
