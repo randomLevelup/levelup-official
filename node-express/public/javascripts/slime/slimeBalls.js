@@ -111,7 +111,7 @@ class Vertex {
         this.iso = 1
     }
 
-    clamp(threshold) {
+    isolate(threshold) {
         this.iso = (this.value < threshold) ? 0 : 1 // this will use active vertex points
         // if (this.value < threshold) { // this will draw constant iso values
         //     this.iso = 0
@@ -198,7 +198,8 @@ class Grid {
                     )
                     this.vList[i][j].value += Math.E ** ((((0.00003 * ball.radius) - 0.0115) * dist) + 5.3)
                 })
-                this.vList[i][j].clamp(75)
+                this.vList[i][j].value = (this.vList[i][j].value - 120) * -1
+                this.vList[i][j].isolate(0)
             }
         }
     }
@@ -278,11 +279,11 @@ function animate() {
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     balls.forEach(ball => {ball.update()})
-    balls.forEach(ball => {ball.draw()})
     grid.updateVerts()
     grid.updateCells()
     grid.drawCells(resolution)
     grid.drawDots(2) // SET DEBUG DOT SIZE!!!
+    balls.forEach(ball => {ball.draw()})
 }
 
 animate()

@@ -37,10 +37,10 @@ function getWorldPos(row, col) {
     return(result)
 }
 
-function interpolate(c1, c2) { // something funky is going on
-    const diff = c2 - c1
-    return (diff / (resolution * 2)) + 0.5
-
+function interpolate(value) { // something funky is going on
+    const result = Math.abs(value) / resolution // i think this works
+    // console.log(result)
+    return result
 }
 
 function deepCopyFunction(inObject) { // imported this function
@@ -111,7 +111,7 @@ class Vertex {
         this.iso = 1
     }
 
-    clamp(threshold) {
+    isolate(threshold) {
         this.iso = (this.value < threshold) ? 0 : 1 // this will use active vertex points
         // if (this.value < threshold) { // this will draw constant iso values
         //     this.iso = 0
@@ -138,17 +138,8 @@ class Cell {
     static draw(pos, size, lookUp, corners) {
         for (let i=0; i<lookUp.length; i++) {
             for (let j=0; j<lookUp[i].length; j++) {
-                if (lookUp[i][j] == 'n') {
-                    lookUp[i][j] = interpolate(corners[3].value, corners[2].value)
-                }
-                else if (lookUp[i][j] == 'e') {
-                    lookUp[i][j] = interpolate(corners[2].value, corners[1].value)
-                }
-                else if (lookUp[i][j] == 's') {
-                    lookUp[i][j] = interpolate(corners[0].value, corners[1].value)
-                }
-                else if (lookUp[i][j] == 'w') {
-                    lookUp[i][j] = interpolate(corners[3].value, corners[0].value)
+                if (typeof lookUp[i][j] == 'string') {
+                    lookUp[i][j] = interpolate(corners[parseInt(lookUp[i][j])].value)
                 }
             }
         }
@@ -198,7 +189,8 @@ class Grid {
                     )
                     this.vList[i][j].value += Math.E ** ((((0.00003 * ball.radius) - 0.0115) * dist) + 5.3)
                 })
-                this.vList[i][j].clamp(75)
+                this.vList[i][j].value = (this.vList[i][j].value - 120) * -1
+                this.vList[i][j].isolate(0)
             }
         }
     }
@@ -265,8 +257,8 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 30 // SET RESOLUTION!!!!
-const balls = fillBalls(50, 200, 2, 4)
+const resolution = 10 // SET RESOLUTION!!!!
+const balls = fillBalls(50, 200, 7, 4)
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
@@ -278,11 +270,11 @@ function animate() {
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     balls.forEach(ball => {ball.update()})
-    balls.forEach(ball => {ball.draw()})
     grid.updateVerts()
     grid.updateCells()
     grid.drawCells(resolution)
-    grid.drawDots(2) // SET DEBUG DOT SIZE!!!
+    grid.drawDots(0.5) // SET DEBUG DOT SIZE!!!
+    balls.forEach(ball => {ball.draw()})
 }
 
 animate()

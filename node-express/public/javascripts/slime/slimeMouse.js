@@ -139,6 +139,7 @@ class Grid {
     }
 
     updateVerts() {
+        console.clear()
         for (let i=0; i<this.vList.length; i++) {
             for (let j=0; j<this.vList[i].length; j++) {
                 const worldPos = getWorldPos(i, j)
@@ -147,6 +148,9 @@ class Grid {
                     worldPos.y - mousePos.y
                 )
                 this.vList[i][j].clamp(75)
+                if (this.vList[i][j].value < 100) {
+                    console.log(this.vList[i][j].value)
+                }
             }
         }
     }
