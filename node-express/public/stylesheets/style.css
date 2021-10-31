@@ -1,7 +1,6 @@
 @font-face {
   font-family: 'Gaz';
-  src: url('Gaz.woff2') format('woff2'),
-       url('Gaz.woff') format('woff');
+  src: url('../fonts/Gaz.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
