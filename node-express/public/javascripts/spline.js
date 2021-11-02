@@ -25,7 +25,7 @@ class Spline {
     constructor() {
         this.pairs = []
     }
-    
+
     movePoint(pair, point, x, y) {
         this.pairs[pair][point] = [x, y]
     }
@@ -111,13 +111,13 @@ let mode = ['orbit'] // this is the default mode
 let activeSpline = false
 let rightclicked = false
 
-addEventListener("mousedown", e => {
+function touch(x, y) {
     if (!activeSpline) {
         let pointFound = false
         splines.forEach((spline, i) => {
             spline.pairs.forEach((pair, j) => {
                 pair.forEach((point, k) => {
-                    const distance = Math.hypot((e.clientX - point[0]), (e.clientY - point[1]))
+                    const distance = Math.hypot((x - point[0]), (y - point[1]))
                     if (distance < 10) {
                         pointFound = true
                         mode = ['movePoint', i, j, k]
@@ -131,16 +131,34 @@ addEventListener("mousedown", e => {
         }
     }
     if (activeSpline) {
-        splines[splines.length-1].addPair(e.clientX, e.clientY)
+        splines[splines.length-1].addPair(x, y)
+    }
+}
+
+addEventListener("mousedown", event => {
+    touch(event.clientX, event.clientY)
+})
+let doubleToggle = false
+let doubleTimer = 0
+addEventListener('touchstart', event => {
+    event.preventDefault()
+    if (doubleToggle) {
+        activeSpline = false
+        doubleToggle = false
+        doubleTimer = 0
+    }
+    else {
+        doubleToggle = true
+        touch(event.touches[0].clientX, event.touches[0].clientY)
     }
 })
 
-addEventListener('contextmenu', e => {
-    e.preventDefault()
+addEventListener('contextmenu', event => {
+    event.preventDefault()
     activeSpline = false
 })
 
-addEventListener('mouseup', e => {
+addEventListener('mouseup', event => {
     if (mode[0] = 'movePoint') {
         mode = ['orbit']
     }
@@ -151,9 +169,18 @@ addEventListener('mousemove', e => {
         splines[mode[1]].movePoint(mode[2], mode[3], e.clientX, e.clientY)
     }
 })
+addEventListener('touchmove', e => {
+    if (mode[0] == 'movePoint') {
+        splines[mode[1]].movePoint(mode[2], mode[3], e.touches[0].clientX, e.touches[0].clientY)
+    }
+})
 
 function animate() {
     requestAnimationFrame(animate)
+
+    doubleTimer += (doubleToggle) ? 1 : 0
+    if (doubleTimer > 25) {doubleTimer = 0; doubleToggle = false}
+    
     c.fillStyle = '#0F1123'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
