@@ -4,6 +4,15 @@ const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+const scale = {
+    handleRadius: ((1 * Math.min(canvas.width, canvas.height)) / 45) - 9.8,
+    handlePointWidth: ((1 * Math.min(canvas.width, canvas.height)) / 120) - 4,
+    handleLineWidth: ((1 * Math.min(canvas.width, canvas.height)) / 240) - 2,
+    splineWidth: ((1 * Math.min(canvas.width, canvas.height)) / 50) - 9.4
+}
+console.log(Math.min(canvas.width, canvas.height))
+console.log(scale)
+
 class VM { // simple abstract vector math class
     static get(p, q) {
         const result = [q[0]-p[0], q[1]-p[1]]
@@ -44,26 +53,26 @@ class Spline {
                 const difference = [pair[0][0] - pair[1][0],
                                     pair[0][1] - pair[1][1]]
 
-                c.lineWidth = 1
+                c.lineWidth = scale.handleLineWidth
                 c.beginPath()
                 c.moveTo(pair[0][0], pair[0][1])
                 c.lineTo(pair[0][0] + (flip * difference[0]),
                          pair[0][1] + (flip * difference[1]))
                 c.stroke()
 
-                c.lineWidth = 2
+                c.lineWidth = scale.handlePointWidth
                 c.beginPath()
                 c.arc(
                     pair[0][0] + (flip * difference[0]),
                     pair[0][1] + (flip * difference[1]),
-                    6, 0, (2*Math.PI), false
+                    scale.handleRadius, 0, (2*Math.PI), false
                 )
                 c.fill()
                 c.stroke()
             })
 
             c.strokeStyle = '#A6F0C6'
-            c.lineWidth = 5
+            c.lineWidth = scale.splineWidth
             if (this.pairs.length > 1) {
                 for (let i=1; i<this.pairs.length; i++) {
                     let inArr = [
