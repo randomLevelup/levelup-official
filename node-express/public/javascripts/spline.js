@@ -159,7 +159,12 @@ addEventListener('contextmenu', event => {
 })
 
 addEventListener('mouseup', event => {
-    if (mode[0] = 'movePoint') {
+    if (mode[0] == 'movePoint') {
+        mode = ['orbit']
+    }
+})
+addEventListener('touchend', event => {
+    if (mode[0] == 'movePoint') {
         mode = ['orbit']
     }
 })
