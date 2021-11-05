@@ -189,6 +189,8 @@ addEventListener('touchmove', e => {
     }
 })
 
+const helpImg = document.getElementById('instsDesktop')
+
 function animate() {
     requestAnimationFrame(animate)
 
@@ -197,6 +199,7 @@ function animate() {
     
     c.fillStyle = '#0F1123'
     c.fillRect(0, 0, canvas.width, canvas.height)
+    c.drawImage(helpImg, 1060, 450, 300, 210)
 
     splines.forEach(spline => {
         spline.draw()
