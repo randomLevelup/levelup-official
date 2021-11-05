@@ -189,7 +189,11 @@ addEventListener('touchmove', e => {
     }
 })
 
-const helpImg = document.getElementById('instsDesktop')
+const isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+const helpImg = (isMobile) ?
+    document.getElementById('instsMobile') :
+    document.getElementById('instsDesktop')
+console.log([canvas.width, canvas.height])
 
 function animate() {
     requestAnimationFrame(animate)
@@ -199,7 +203,7 @@ function animate() {
     
     c.fillStyle = '#0F1123'
     c.fillRect(0, 0, canvas.width, canvas.height)
-    c.drawImage(helpImg, 1060, 450, 300, 210)
+    c.drawImage(helpImg, canvas.width - 410, canvas.height - 290, 400, 280)
 
     splines.forEach(spline => {
         spline.draw()
