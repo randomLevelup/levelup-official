@@ -322,7 +322,8 @@ function animate() { // animation loop
 // init sequence
 addBubble(0, 0, 1.6, 'aboutSource', 'about')
 addBubble(0.7, 4, 1.05, 'mazeSource', 'maze')
-addBubble(0.3, 7, 1.05, 'physicsSource', 'bouncy')
+addBubble(0.3, 7.5, 0.9, 'physicsSource', 'bouncy')
+addBubble(0, 5.8, 0.9, 'slimeSource', 'slime')
 addBubble(0.1, 10, 1.05, 'nodesSource', 'nodes')
 addBubble(0.2, 13, 1.05, 'splinesSource', 'spline')
 const terrF = new Terrain((canvas.height / 1.2), '#18618C')
