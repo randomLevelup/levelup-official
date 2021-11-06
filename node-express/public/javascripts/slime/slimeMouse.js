@@ -1,25 +1,25 @@
 let lut = [
     [[0,0],[1,0],[1,1],[0,1]],
-    [[0,0],[1,0],[1,1],['s',1],[0,'w']],
-    [[0,0],[1,0],[1,'e'],['s',1],[0,1]],
-    [[0,0],[1,0],[1,'e'],[0,'w']],
-    [[0,0],['n',0],[1,'e'],[1,1],[0,1]],
+    [[0,0],[1,0],[1,1],['0',1],[0,'0']],
+    [[0,0],[1,0],[1,'1'],['1',1],[0,1]],
+    [[0,0],[1,0],[1,'1'],[0,'0']],
+    [[0,0],['2',0],[1,'2'],[1,1],[0,1]],
     [
-        [[0,0],['n',0],[0,'w']],
-        [[1,'e'],[1,1],['s',1]]
+        [[0,0],['2',0],[0,'1']],
+        [[1,'2'],[1,1],['0',1]]
     ],
-    [[0,0],['n',0],['s',1],[0,1]],
-    [[0,0],['n',0],[0,'w']],
-    [['n',0],[1,0],[1,1],[0,1],[0,'w']],
-    [['n',0],[1,0],[1,1],['s',1]],
+    [[0,0],['2',0],['1',1],[0,1]],
+    [[0,0],['2',0],[0,'0']],
+    [['3',0],[1,0],[1,1],[0,1],[0,'3']],
+    [['3',0],[1,0],[1,1],['0',1]],
     [
-        [['n',0],[1,0],[1,'e']],
-        [['s',1],[0,1],[0,'w']]
+        [['3',0],[1,0],[1,'1']],
+        [['1',1],[0,1],[0,'3']]
     ],
-    [['n',0],[1,0],[1,'e']],
-    [[0,'w'],[1,'e'],[1,1],[0,1]],
-    [[1,'e'],[1,1],['s',1]],
-    [['s',1],[0,1],[0,'w']],
+    [['3',0],[1,0],[1,'1']],
+    [[0,'3'],[1,'2'],[1,1],[0,1]],
+    [[1,'2'],[1,1],['0',1]],
+    [['2',1],[0,1],[0,'3']],
     []
 ]
 
@@ -37,10 +37,10 @@ function getWorldPos(row, col) {
     return(result)
 }
 
-function interpolate(c1, c2) { // something funky is going on
-    const diff = c2 - c1
-    return (diff / (resolution * 2)) + 0.5
-
+function interpolate(value) { // something funky is going on
+    const result = Math.abs(value) / resolution // i think this works
+    // console.log(result)
+    return result
 }
 
 function deepCopyFunction(inObject) { // imported this function
@@ -58,13 +58,60 @@ function deepCopyFunction(inObject) { // imported this function
     return outObject
 }
 
+class Ball {
+    constructor(x, y, radius, vel) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+
+        const theta = Math.random() * (2 * Math.PI)
+        this.velX = Math.cos(theta) * vel
+        this.velY = Math.sin(theta) * vel
+    }
+    update() {
+        if (this.x + this.radius > canvas.width) {
+            this.velX *= -1
+        }
+        if (this.x - this.radius < 0) {
+            this.velX *= -1
+        }
+        if (this.y + this.radius > canvas.height) {
+            this.velY *= -1
+        }
+        if (this.y - this.radius < 0) {
+            this.velY *= -1
+        }
+
+        this.x += this.velX
+        this.y += this.velY
+    }
+    draw() {
+        c.strokeStyle = 'red'
+        c.lineWidth = 2
+        c.beginPath()
+        c.arc(this.x, this.y, this.radius, 0, (2*Math.PI), false)
+        c.stroke()
+    }
+}
+
+function fillBalls(minRad, maxRad, vel, amt) {
+    const result = []
+    for (let i=0; i<=amt; i++) {
+        const rad = minRad + (Math.random() * (maxRad - minRad))
+        const xPos = rad + (Math.random() * canvas.width - (2 * rad))
+        const yPos = rad + (Math.random() * canvas.height - (2 * rad))
+        result.push(new Ball(xPos, yPos, rad, vel))
+    }
+    return result
+}
+
 class Vertex {
     constructor(value) {
         this.value = value
         this.iso = 1
     }
 
-    clamp(threshold) {
+    isolate(threshold) {
         this.iso = (this.value < threshold) ? 0 : 1 // this will use active vertex points
         // if (this.value < threshold) { // this will draw constant iso values
         //     this.iso = 0
@@ -91,17 +138,8 @@ class Cell {
     static draw(pos, size, lookUp, corners) {
         for (let i=0; i<lookUp.length; i++) {
             for (let j=0; j<lookUp[i].length; j++) {
-                if (lookUp[i][j] == 'n') {
-                    lookUp[i][j] = interpolate(corners[3].value, corners[2].value)
-                }
-                else if (lookUp[i][j] == 'e') {
-                    lookUp[i][j] = interpolate(corners[2].value, corners[1].value)
-                }
-                else if (lookUp[i][j] == 's') {
-                    lookUp[i][j] = interpolate(corners[0].value, corners[1].value)
-                }
-                else if (lookUp[i][j] == 'w') {
-                    lookUp[i][j] = interpolate(corners[3].value, corners[0].value)
+                if (typeof lookUp[i][j] == 'string') {
+                    lookUp[i][j] = interpolate(corners[parseInt(lookUp[i][j])].value)
                 }
             }
         }
@@ -139,18 +177,26 @@ class Grid {
     }
 
     updateVerts() {
-        console.clear()
         for (let i=0; i<this.vList.length; i++) {
             for (let j=0; j<this.vList[i].length; j++) {
                 const worldPos = getWorldPos(i, j)
-                this.vList[i][j].value = Math.hypot(
+                this.vList[i][j].value = 0
+                // balls.forEach(ball => {
+                //     const dist = Math.hypot(
+                //         // CHECK DISTANCE FROM EVERY BALL
+                //         worldPos.x - ball.x,
+                //         worldPos.y - ball.y
+                //     )
+                //     this.vList[i][j].value += Math.E ** ((((0.00003 * ball.radius) - 0.0115) * dist) + 5.3)
+                // })
+                const dist = Math.hypot(
                     worldPos.x - mousePos.x,
                     worldPos.y - mousePos.y
                 )
-                this.vList[i][j].clamp(75)
-                if (this.vList[i][j].value < 100) {
-                    console.log(this.vList[i][j].value)
-                }
+                this.vList[i][j].value += Math.E ** ((((0.00003 * 200) - 0.0115) * dist) + 5.3)
+
+                this.vList[i][j].value = (this.vList[i][j].value - 120) * -1
+                this.vList[i][j].isolate(0)
             }
         }
     }
@@ -217,31 +263,27 @@ class Grid {
 c.fillStyle = 'black'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
-const resolution = 120 // SET RESOLUTION!!!!
+const resolution = 40 // SET RESOLUTION!!!!
+// const balls = fillBalls(50, 200, 7, 4)
 const grid = new Grid(
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
     (Math.max(canvas.width, canvas.height) / resolution) + 1,
 )
 
-// grid.vList[1][1].value = 0
-// grid.vList[1][2].value = 0
-
-function drawScreen() {
-    c.fillStyle = 'black'
-    c.fillRect(0, 0, canvas.width, canvas.height)
-
-    grid.updateVerts()
-    grid.updateCells()
-    grid.drawCells(resolution)
-    grid.drawDots(3) // SET DEBUG DOT SIZE!!!
-}
-
 function animate() {
     requestAnimationFrame(animate)
     if (mode == 'down') {
-        drawScreen()
-    }
+        c.fillStyle = 'black'
+        c.fillRect(0, 0, canvas.width, canvas.height)
 
+        // balls.forEach(ball => {ball.update()})
+        grid.updateVerts()
+        grid.updateCells()
+        grid.drawCells(resolution)
+        grid.drawDots(2) // SET DEBUG DOT SIZE!!!
+        // balls.forEach(ball => {ball.draw()})
+    }
+        
 }
 
 const mousePos = {x: -1, y: -1}
@@ -257,5 +299,5 @@ addEventListener('mouseup', (evt) => {
     mode = 'up'
 })
 
-drawScreen()
+grid.drawDots(2)
 animate()
