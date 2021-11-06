@@ -173,6 +173,7 @@ addEventListener('mouseup', event => {
     }
 })
 addEventListener('touchend', event => {
+    event.preventDefault()
     if (mode[0] == 'movePoint') {
         mode = ['orbit']
     }
@@ -184,10 +185,12 @@ addEventListener('mousemove', e => {
     }
 })
 addEventListener('touchmove', e => {
+    e.preventDefault()
     if (mode[0] == 'movePoint') {
         splines[mode[1]].movePoint(mode[2], mode[3], e.touches[0].clientX, e.touches[0].clientY)
     }
 })
+addEventListener('touchcancel', event => {event.preventDefault()})
 
 const isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
 const helpImg = (isMobile) ?
