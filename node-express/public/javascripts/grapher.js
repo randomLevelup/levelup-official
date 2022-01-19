@@ -4,6 +4,12 @@ const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+const col1 = '#00313A'
+const col2 = '#39A2DB'
+const col3 = '#E8F0F2'
+
+
+
 function touch(x, y) {
     // do something on touch
 }

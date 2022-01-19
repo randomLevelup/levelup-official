@@ -10,42 +10,139 @@ const aSize = {x: 370, y: 220}
 const qRaise = 160
 const aDrop = 20
 
+const bubbleRamp = 0.4
+
 const col1 = '#00313A'
 const col2 = '#39A2DB'
 const col3 = '#E8F0F2'
 
-class Question {
-    constructor(question, pxSize, answers) {
-        this.text = question.split('\n')
-        this.pxSize = pxSize
-        this.textHeight = (pxSize + 5) * this.text.length
-        this.answers = answers
+function ramptoSize(ramp, baseSize) {
+    const exponent = (-0.5 * ramp) + 5
+    const divisor = 1 + (Math.E ** exponent)
+    return {
+        x: (20 / divisor) + baseSize.x,
+        y: (20 / divisor) + baseSize.y
+    }
+}
+
+class Button { // large bubble class
+    constructor(x, y, sizeX, sizeY) {
+        this.pos = {
+            x: x,
+            y: y
+        }
+        this.size = {
+            x: sizeX,
+            y: sizeY
+        }
+        this.ramp = 0
+        this.baseSize = {
+            x: sizeX,
+            y: sizeY
+        }
+
+        this.maxTime = 500 + Math.floor((Math.random()) * 200)
+        this.time = Math.floor(Math.random() * this.maxTime)
+
+        this.canHover = true
+        this.hover = false
+        this.hoverTime = 0
+    }
+
+    drawTest() {
+        c.beginPath()
+        c.arc(this.pos.x, this.pos.y, this.radius, 0, 7, false)
+        c.fillStyle = '#053742'
+        c.fill()
+        c.strokeStyle = '#39A2DB'
+        c.lineWidth = 5
+        c.stroke()
     }
 
     draw() {
         const corner = {
-            x: (canvas.width / 2) - (qSize.x / 2),
-            y: (canvas.height / 2) - qRaise - (qSize.y / 2)
+            x: this.pos.x - (this.size.x / 2),
+            y: this.pos.y - (this.size.y / 2)
         }
 
         c.fillStyle = col2
         c.beginPath()
         c.arc(
-            (canvas.width / 2) - (qSize.x / 2), canvas.height / 2 - qRaise,
-            qSize.y / 2, 0, 2 * Math.PI, false
+            corner.x, corner.y + (this.size.y / 2),
+            (this.size.y / 2), 0, 2 * Math.PI, false
         )
         c.arc(
-            (canvas.width / 2) + (qSize.x / 2), canvas.height / 2 - qRaise,
-            qSize.y / 2, 0, 2 * Math.PI, false
+            corner.x + this.size.x, corner.y + (this.size.y / 2), 
+            (this.size.y / 2), 0, 2 * Math.PI, false
         )
         c.fill()
-        c.fillRect(corner.x, corner.y, qSize.x, qSize.y)
-        
+        c.fillRect(corner.x, corner.y, this.size.x, this.size.y)
+    }
+
+    getFloatPhase() {
+        const phase = (this.time / this.maxTime) * (2 * Math.PI)
+        return Math.sin(phase) / 10
+    }
+
+    update() {
+        if (this.time > this.maxTime) {
+            this.time = 0
+        }
+        else {
+            this.time += 1
+        }
+        // this.pos.y += this.getFloatPhase() // floaty
+
+        if (this.hover) {
+            if (this.ramp < 20) {
+                this.ramp += bubbleRamp
+                this.size = ramptoSize(this.ramp, this.baseSize)
+            }
+        }
+        else {
+            if (this.ramp > 0) {
+                this.ramp -= bubbleRamp
+                this.size = ramptoSize(this.ramp, this.baseSize)
+            }
+        }
+
+        this.draw()
+    }
+}
+
+class Question extends Button{
+    constructor(x, y, question, pxSize, textX, textY, answers) {
+        super(x, y, 200, 120)
+        this.canHover = false
+
+        this.text = question.split('\n')
+        this.textPos = {
+            x: textX,
+            y: textY
+        }
+        this.pxSize = pxSize
+        this.textHeight = (pxSize + 5) * this.text.length
+        this.answers = answers
+    }
+
+    drawQuestion() {
+        this.update()
+
+        const corner = {
+            x: this.pos.x - (this.size.x / 2),
+            y: this.pos.y - (this.size.y / 2)
+        }
+
         c.fillStyle = col3
-        
         // !!! this.text is a list of strings; rework for iteration
         c.font = this.pxSize.toString() + 'px cream DEMO'
-        c.fillText(this.text, corner.x, (canvas.height / 2) - qRaise)
+        this.text.forEach((line, i) => {
+            c.fillText(
+                line, corner.x + this.textPos.x,
+                corner.y + this.textPos.y + ((this.pxSize + 5) * i)
+            )
+        })
+        
     }
 }
 
@@ -76,6 +173,8 @@ addEventListener('contextmenu', event => {
     // do something on right click
 })
 
+
+
 function animate() {
     requestAnimationFrame(animate)
 
@@ -87,14 +186,32 @@ function animate() {
 
     // draw screen
     questions.forEach(question => {
-        question.draw()
+        question.drawQuestion()
     })
 }
 
 console.log([canvas.width, canvas.height])
 
 let questions = [
-    new Question("one plus\none", 60, ["yes", "no", "maybe"])
+    new Question(400, 200, "one plus\none", 35, 30, 50, ["yes", "no", "maybe"])
 ]
+
+// button hover
+addEventListener('mousemove', (pos) => {
+    questions.forEach(qu => {
+        if (
+            pos.clientX > qu.pos.x &&
+            pos.clientX < qu.pos.x + qu.size.x &&
+            pos.clientY > qu.pos.y &&
+            pos.clientY < qu.pos.y + qu.size.y &&
+            qu.canHover
+        ) {
+            qu.hover = true
+        }
+        else {
+            qu.hover = false
+        }
+    })
+})
 
 animate()
