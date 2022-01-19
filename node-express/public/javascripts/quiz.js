@@ -7,8 +7,8 @@ canvas.height = innerHeight
 const qSize = {x: 290, y: 180}
 const aSize = {x: 370, y: 220}
 
-const qRaise = 160
-const aDrop = 20
+const aScale = -60
+const aDrop = 200
 
 const bubbleRamp = 0.4
 
@@ -26,7 +26,7 @@ function ramptoSize(ramp, baseSize) {
 }
 
 class Button { // large bubble class
-    constructor(x, y, sizeX, sizeY) {
+    constructor(x, y, sizeX, sizeY, text, textX, textY, pxSize) {
         this.pos = {
             x: x,
             y: y
@@ -44,9 +44,16 @@ class Button { // large bubble class
         this.maxTime = 500 + Math.floor((Math.random()) * 200)
         this.time = Math.floor(Math.random() * this.maxTime)
 
-        this.canHover = true
         this.hover = false
         this.hoverTime = 0
+
+        this.text = text.split('\n')
+        this.textPos = {
+            x: textX,
+            y: textY
+        }
+        this.pxSize = pxSize
+        this.textHeight = (pxSize + 5) * this.text.length
     }
 
     drawTest() {
@@ -77,6 +84,16 @@ class Button { // large bubble class
         )
         c.fill()
         c.fillRect(corner.x, corner.y, this.size.x, this.size.y)
+
+        c.fillStyle = col3
+        // !!! this.text is a list of strings; rework for iteration
+        c.font = this.pxSize.toString() + 'px cream DEMO'
+        this.text.forEach((line, i) => {
+            c.fillText(
+                line, corner.x + this.textPos.x,
+                corner.y + this.textPos.y + ((this.pxSize + 5) * i)
+            )
+        })
     }
 
     getFloatPhase() {
@@ -111,38 +128,26 @@ class Button { // large bubble class
 }
 
 class Question extends Button{
-    constructor(x, y, question, pxSize, textX, textY, answers) {
-        super(x, y, 200, 120)
-        this.canHover = false
+    constructor(x, y, sizeX, sizeY, text, textX, textY, pxSize, answers) {
+        super(x, y, sizeX, sizeY, text, textX, textY, pxSize)
 
-        this.text = question.split('\n')
-        this.textPos = {
-            x: textX,
-            y: textY
-        }
-        this.pxSize = pxSize
-        this.textHeight = (pxSize + 5) * this.text.length
-        this.answers = answers
+        // answer format: [text, textX, textY, pxSize]
+        this.answers = []
+        const answersLength = answers.length * (sizeX + aScale + 45)
+        const leftBound = x - (answersLength / 2)
+        answers.forEach((answer, i) => {
+            this.answers.push(new Button(
+                leftBound + ((sizeX + aScale + 110) * i), y + aDrop,
+                sizeX + aScale, sizeY + aScale, answer[0],
+                answer[1], answer[2], answer[3]
+            ))
+        })
     }
 
-    drawQuestion() {
-        this.update()
-
-        const corner = {
-            x: this.pos.x - (this.size.x / 2),
-            y: this.pos.y - (this.size.y / 2)
-        }
-
-        c.fillStyle = col3
-        // !!! this.text is a list of strings; rework for iteration
-        c.font = this.pxSize.toString() + 'px cream DEMO'
-        this.text.forEach((line, i) => {
-            c.fillText(
-                line, corner.x + this.textPos.x,
-                corner.y + this.textPos.y + ((this.pxSize + 5) * i)
-            )
+    drawAnswers() {
+        this.answers.forEach(answer => {
+            answer.update()
         })
-        
     }
 }
 
@@ -174,7 +179,6 @@ addEventListener('contextmenu', event => {
 })
 
 
-
 function animate() {
     requestAnimationFrame(animate)
 
@@ -186,31 +190,49 @@ function animate() {
 
     // draw screen
     questions.forEach(question => {
-        question.drawQuestion()
+        question.update()
+        question.drawAnswers()
     })
 }
 
 console.log([canvas.width, canvas.height])
 
 let questions = [
-    new Question(400, 200, "one plus\none", 35, 30, 50, ["yes", "no", "maybe"])
+    // answer format: [text, textX, textY, pxSize]
+    new Question(
+        canvas.width / 2, 250, 200, 130, "how many legs\ndo i have?",
+        35, 30, 30, [
+            ["two", 50, 60, 24],
+            ["three", 30, 60, 24],
+            ["four", 40, 60, 24],
+            ["five", 40, 60, 24] //,
+            // ["six", 50, 60, 24]
+        ]
+    )
 ]
+console.log(questions)
 
 // button hover
 addEventListener('mousemove', (pos) => {
-    questions.forEach(qu => {
-        if (
-            pos.clientX > qu.pos.x &&
-            pos.clientX < qu.pos.x + qu.size.x &&
-            pos.clientY > qu.pos.y &&
-            pos.clientY < qu.pos.y + qu.size.y &&
-            qu.canHover
-        ) {
-            qu.hover = true
-        }
-        else {
-            qu.hover = false
-        }
+    questions.forEach(question => {
+        question.answers.forEach(an => {
+            const corner = {
+                x: an.pos.x - (an.size.x / 2),
+                y: an.pos.y - (an.size.y / 2)
+            }
+
+            if (
+                pos.clientX > corner.x &&
+                pos.clientX < corner.x + an.size.x &&
+                pos.clientY > corner.y &&
+                pos.clientY < corner.y + an.size.y
+            ) {
+                an.hover = true
+            }
+            else {
+                an.hover = false
+            } 
+        });
     })
 })
 
