@@ -8,7 +8,11 @@ const col1 = '#00313A'
 const col2 = '#39A2DB'
 const col3 = '#E8F0F2'
 
-
+class Line {
+    constructor(xPos, pointPos, isActive) {
+        
+    }
+}
 
 function touch(x, y) {
     // do something on touch
