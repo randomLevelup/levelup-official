@@ -153,7 +153,7 @@ function animate() {
     c.moveTo(grid[0].xPos, plotSpace.y1 - (grid[0].point.value * yHeight))
 
     let trace = true
-    grid.forEach(line => {
+    grid.forEach(line => { // connect the dots
         if (trace) {
             if (line.point.exists) {
                 c.lineTo(line.xPos, plotSpace.y1 - (line.point.value * yHeight))
