@@ -181,6 +181,9 @@ function animate() {
     c.fillText(scenes[cScene].year1 + "-" + scenes[cScene].year2, 198, 90)
     c.fillText(scenes[cScene].year1, 110, 640)
     c.fillText(scenes[cScene].year2, 1170, 640)
+    
+    c.font = '24px cream DEMO'
+    c.fillText("(click and drag =>)", 250, 638)
 
     // draw frame
     if (scenes[cScene].reveal) {
