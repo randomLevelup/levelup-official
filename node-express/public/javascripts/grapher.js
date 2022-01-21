@@ -8,7 +8,7 @@ const plotSpace = {
     x0: 150,
     y0: 110,
     x1: canvas.width - 100,
-    y1: canvas.height - 160
+    y1: canvas.height - 95
 }
 const yHeight = plotSpace.y1 - plotSpace.y0
 const numLines = 20
