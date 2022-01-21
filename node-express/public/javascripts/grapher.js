@@ -64,6 +64,18 @@ class Scene {
 
 function touch(x, y) {
     // do something on touch
+    if (x > 800 && x < 990 && y > 10 && y < 100) {
+        scenes[cScene].reveal = (scenes[cScene].reveal) ? false : true
+    }
+    else if (x > 1000 && x < 1190 && y > 10 && y < 100) {
+        scenes[cScene].reveal = false
+        if (cScene + 1 >= scenes.length) {
+            cScene = 0
+        }
+        else {cScene += 1}
+        clearGrid(0)
+        grid[0].point.value = scenes[cScene].data[0].point.value
+    }
     mode = 'drag'
 }
 
@@ -151,27 +163,27 @@ function animate() {
 
     doubleTimer += (doubleToggle) ? 1 : 0
     if (doubleTimer > 25) {doubleTimer = 0; doubleToggle = false}
-    
-    const cScene = scenes[0]
-    
+        
     // draw frame background
     c.fillStyle = palette[0]
     c.fillRect(0, 0, canvas.width, canvas.height)
     c.drawImage(axes, 50, 15, 1300, 650)
+    c.drawImage(solbtn, 800, 10, 190, 90)
+    c.drawImage(nxtbtn, 1000, 10, 190, 90)
 
     // draw frame
-    if (cScene.reveal) {
-        cScene.data.forEach(line => {
+    if (scenes[cScene].reveal) {
+        scenes[cScene].data.forEach(line => {
             line.draw('hint')
         })
 
         c.strokeStyle = palette[5]
         c.lineWidth = 4
         c.beginPath()
-        c.moveTo(cScene.data[0].xPos, plotSpace.y1 - (cScene.data[0].point.value * yHeight))
+        c.moveTo(scenes[cScene].data[0].xPos, plotSpace.y1 - (scenes[cScene].data[0].point.value * yHeight))
 
         let trace = true
-        cScene.data.forEach(line => { // connect the dots
+        scenes[cScene].data.forEach(line => { // connect the dots
             if (trace) {
                 if (line.point.exists) {
                     c.lineTo(line.xPos, plotSpace.y1 - (line.point.value * yHeight))
@@ -202,7 +214,6 @@ function animate() {
             else {trace = false}
         }
     })
-    console.log(strOut)
     c.stroke()
 }
 
@@ -212,13 +223,13 @@ for (let i=0; i<numLines; i++) {
 }
 let activeLine = 0
 grid[0].point.exists = true
-grid[0].point.value = 0.5
+grid[0].point.value = 0.35
 
 const scenes = [
     new Scene([0.35,0.3593155893536122,0.3593155893536122,0.3612167300380228,0.37072243346007605,0.5,0.688212927756654,0.7034220532319392,0.720532319391635,0.7433460076045627,0.7642585551330798,0.7889733840304183,0.8365019011406845,0.8802281368821293,0.94106463878327,0.9467680608365019,0.94106463878327,0.9619771863117871,0.9619771863117871,0.9562737642585551,0.9923954372623575]),
     new Scene([0.67,0.6806083650190115,0.6977186311787072,0.7053231939163498,0.7091254752851711,0.7110266159695817,0.720532319391635,0.7338403041825095,0.7490494296577946,0.752851711026616,0.7585551330798479,0.7661596958174905,0.7908745247148289,0.8365019011406845,0.8878326996197718,0.8688212927756654,0.8536121673003803,0.8574144486692015,0.8745247148288974,0.8954372623574145,0.903041825095057]),
     new Scene([0.15,0.09125475285171103,0.09315589353612168,0.10456273764258556,0.12737642585551331,0.21673003802281368,0.4011406844106464,0.41254752851711024,0.41825095057034223,0.42015209125475284,0.42015209125475284,0.43155893536121676,0.467680608365019,0.5285171102661597,0.5988593155893536,0.7604562737642585,0.8098859315589354,0.8840304182509505,0.9125475285171103,0.9182509505703422,0.9467680608365019])
 ]
-scenes[0].reveal = true
+let cScene = 0
 
 animate()
