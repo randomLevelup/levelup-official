@@ -44,22 +44,6 @@ class Line {
             c.arc(this.xPos, yPos, 10, 0, 7, false)
             c.fill()
         }
-
-        c.strokeStyle = palette[7]
-        c.lineWidth = 5
-        c.beginPath()
-        c.moveTo(grid[0].xPos, plotSpace.y1 - (grid[0].point.value * yHeight))
-
-        let trace = true
-        grid.forEach(line => {
-            if (trace) {
-                if (line.point.exists) {
-                    c.lineTo(line.xPos, plotSpace.y1 - (line.point.value * yHeight))
-                }
-                else {trace = false}
-            }
-        })
-        c.stroke()
     }
 }
 
@@ -161,6 +145,22 @@ function animate() {
     // draw screen
     grid.forEach(line => {
         line.draw()
+
+        c.strokeStyle = palette[7]
+        c.lineWidth = 5
+        c.beginPath()
+        c.moveTo(grid[0].xPos, plotSpace.y1 - (grid[0].point.value * yHeight))
+
+        let trace = true
+        grid.forEach(line => {
+            if (trace) {
+                if (line.point.exists) {
+                    c.lineTo(line.xPos, plotSpace.y1 - (line.point.value * yHeight))
+                }
+                else {trace = false}
+            }
+        })
+        c.stroke()
     })
 }
 
