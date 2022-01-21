@@ -8,7 +8,7 @@ const plotSpace = {
     x0: 150,
     y0: 110,
     x1: canvas.width - 100,
-    y1: canvas.height - 110
+    y1: canvas.height - 160
 }
 const yHeight = plotSpace.y1 - plotSpace.y0
 const numLines = 20
@@ -171,7 +171,7 @@ function animate() {
     // draw frame background
     c.fillStyle = palette[0]
     c.fillRect(0, 0, canvas.width, canvas.height)
-    c.drawImage(axes, 50, 15, 1300, 650)
+    c.drawImage(axes, 50, 15, 1300, 600)
     c.drawImage(solbtn, 800, 10, 190, 90)
     c.drawImage(nxtbtn, 1000, 10, 190, 90)
 
@@ -179,11 +179,11 @@ function animate() {
     c.fillStyle = palette[5]
     c.fillText("Graph: " + scenes[cScene].label, 110, 50)
     c.fillText(scenes[cScene].year1 + "-" + scenes[cScene].year2, 198, 90)
-    c.fillText(scenes[cScene].year1, 110, 640)
-    c.fillText(scenes[cScene].year2, 1170, 640)
+    c.fillText(scenes[cScene].year1, 110, 595)
+    c.fillText(scenes[cScene].year2, 1170, 595)
     
     c.font = '24px cream DEMO'
-    c.fillText("(click and drag =>)", 250, 638)
+    c.fillText("(click and drag =>)", 250, 593)
 
     // draw frame
     if (scenes[cScene].reveal) {
