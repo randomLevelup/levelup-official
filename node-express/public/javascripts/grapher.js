@@ -5,9 +5,9 @@ canvas.width = innerWidth
 canvas.height = innerHeight
 
 const plotSpace = {
-    x0: 110,
+    x0: 150,
     y0: 110,
-    x1: canvas.width - 110,
+    x1: canvas.width - 100,
     y1: canvas.height - 110
 }
 const yHeight = plotSpace.y1 - plotSpace.y0
@@ -19,6 +19,9 @@ const palette = [
     '#041C32', '#04293A', '#064663', '#475F75',
     '#476C7D', '#4989A6', '#ECB365', '#FFF6A8'
 ]
+const solbtn = document.getElementById('solution')
+const nxtbtn = document.getElementById('next')
+const axes = document.getElementById('axes')
 
 class Line {
     constructor(xPos) {
@@ -151,11 +154,12 @@ function animate() {
     
     const cScene = scenes[0]
     
+    // draw frame background
     c.fillStyle = palette[0]
     c.fillRect(0, 0, canvas.width, canvas.height)
+    c.drawImage(axes, 50, 15, 1300, 650)
 
-    // draw screen
-
+    // draw frame
     if (cScene.reveal) {
         cScene.data.forEach(line => {
             line.draw('hint')
