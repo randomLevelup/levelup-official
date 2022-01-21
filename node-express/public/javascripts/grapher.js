@@ -16,8 +16,8 @@ const lineSpace = (plotSpace.x1 - plotSpace.x0) / numLines
 let mode = 'orbit'
 
 const palette = [
-    '#041C32', '#04293A', '#064663', '#172F45',
-    '#173C4D', '#173C4D', '#ECB365', '#FFC678'
+    '#041C32', '#04293A', '#064663', '#475F75',
+    '#476C7D', '#4989A6', '#ECB365', '#FFF6A8'
 ]
 
 class Line {
@@ -29,8 +29,8 @@ class Line {
         }
     }
 
-    draw() {
-        c.strokeStyle = palette[4]
+    draw(mode) {
+        c.strokeStyle = palette[2]
         c.lineWidth = 2
         c.beginPath()
         c.moveTo(this.xPos, plotSpace.y0)
@@ -40,10 +40,22 @@ class Line {
         if (this.point.exists) {
             const yPos = plotSpace.y1 - (this.point.value * yHeight)
             c.beginPath()
-            c.fillStyle = palette[6]
+            c.fillStyle = (mode == 'user') ? palette[6] : palette[4]
             c.arc(this.xPos, yPos, 10, 0, 7, false)
             c.fill()
         }
+    }
+}
+
+class Scene {
+    constructor(data) {// TODO: implement image as part of construction
+        this.data = []
+        for (let i=0; i<numLines; i++) {
+            this.data.push(new Line(plotSpace.x0 + (lineSpace * i)))
+            this.data[i].point.exists = true
+            this.data[i].point.value = data[i]
+        }
+        this.reveal = false
     }
 }
 
@@ -95,7 +107,6 @@ addEventListener("mousedown", event => {
 let doubleToggle = false
 let doubleTimer = 0
 addEventListener('touchstart', event => {
-    event.preventDefault()
     if (doubleToggle) {
         // do something on double click
         doubleToggle = false
@@ -111,7 +122,6 @@ addEventListener("mouseup", event => {
     mode = 'orbit'
 })
 addEventListener("touchend", event => {
-    event.preventDefault()
     mode = 'orbit'
 })
 
@@ -139,12 +149,37 @@ function animate() {
     doubleTimer += (doubleToggle) ? 1 : 0
     if (doubleTimer > 25) {doubleTimer = 0; doubleToggle = false}
     
+    const cScene = scenes[0]
+    
     c.fillStyle = palette[0]
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     // draw screen
+
+    if (cScene.reveal) {
+        cScene.data.forEach(line => {
+            line.draw('hint')
+        })
+
+        c.strokeStyle = palette[5]
+        c.lineWidth = 4
+        c.beginPath()
+        c.moveTo(cScene.data[0].xPos, plotSpace.y1 - (cScene.data[0].point.value * yHeight))
+
+        let trace = true
+        cScene.data.forEach(line => { // connect the dots
+            if (trace) {
+                if (line.point.exists) {
+                    c.lineTo(line.xPos, plotSpace.y1 - (line.point.value * yHeight))
+                }
+                else {trace = false}
+            }
+        })
+        c.stroke()
+    }
+
     grid.forEach(line => {
-        line.draw()
+        line.draw('user')
     })
 
     c.strokeStyle = palette[7]
@@ -170,6 +205,11 @@ for (let i=0; i<numLines; i++) {
 }
 let activeLine = 0
 grid[0].point.exists = true
-grid[0].point.value = 0.8
+grid[0].point.value = 0.5
+
+const scenes = [
+    new Scene([0,0.1,0.2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+]
+scenes[0].reveal = true
 
 animate()
