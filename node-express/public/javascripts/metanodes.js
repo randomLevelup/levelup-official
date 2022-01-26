@@ -11,13 +11,14 @@ class Node {
             y: y
         }
         this.vel = {
-            x: velx,
-            y: vely
+            x: velX,
+            y: velY
         }
     }
 
     draw() {
-        c.arc(this.x, this.y, r, 0, (2*Math.PI), false)
+        c.beginPath()
+        c.arc(this.pos.x, this.pos.y, 10, 0, (2*Math.PI), false)
         c.fillStyle = "#FEDDBE"
         c.fill()
     }
@@ -25,8 +26,6 @@ class Node {
     update() {
         this.pos.x = this.pos.x + this.vel.x
         this.pos.y = this.pos.y + this.vel.y
-        
-        this.draw()
     }
 }
 
@@ -62,11 +61,44 @@ function animate() {
 
     doubleTimer += (doubleToggle) ? 1 : 0
     if (doubleTimer > 25) {doubleTimer = 0; doubleToggle = false}
-    
     c.fillStyle = '#0F1123'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     // draw screen
+    nodeArr.forEach(node => {
+        node.update()
+        node.draw()
+    })
+    for (let i=0; i<100; i++) {
+        for (let j=0; j<100; j++) {
+            const drawPoint = {
+                x: (canvas.width / 100) * i,
+                y: (canvas.height / 100) * j
+            }
+            let sumDist = 0
+            nodeArr.forEach(node => {
+
+                const iDist = Math.sqrt(
+                    Math.pow(node.pos.x - drawPoint.x, 2) +
+                    Math.pow(node.pos.y - drawPoint.y, 2)
+                )
+                // const term = (-1 * iDist) + 400
+                const term = Math.pow(((iDist - 400) / 20), 2)
+                sumDist += Math.max(term, 0)
+            })
+            if (sumDist > 260 && sumDist < 270) {
+                c.beginPath()
+                c.arc(drawPoint.x, drawPoint.y, 5, 0, (2*Math.PI), false)
+                c.fillStyle = '#185ADB'
+                c.fill()
+            }
+        }
+    }
 }
+
+const nodeArr = [
+    new Node(100, 350, 0.8, 0),
+    new Node(1000, 400, -0.8, 0)
+]
 
 animate()
