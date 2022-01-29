@@ -69,11 +69,11 @@ function animate() {
         node.update()
         node.draw()
     })
-    for (let i=0; i<100; i++) {
-        for (let j=0; j<100; j++) {
+    for (let i=0; i<80; i++) {
+        for (let j=0; j<50; j++) {
             const drawPoint = {
-                x: (canvas.width / 100) * i,
-                y: (canvas.height / 100) * j
+                x: (canvas.width / 80) * i,
+                y: (canvas.height / 50) * j
             }
             let sumDist = 0
             nodeArr.forEach(node => {
@@ -82,14 +82,15 @@ function animate() {
                     Math.pow(node.pos.x - drawPoint.x, 2) +
                     Math.pow(node.pos.y - drawPoint.y, 2)
                 )
-                // const term = (-1 * iDist) + 400
-                const term = Math.pow(((iDist - 400) / 20), 2)
-                sumDist += Math.max(term, 0)
+
+                sumDist += Math.log2(iDist) // this works for some reason
             })
-            if (sumDist > 260 && sumDist < 270) {
+            if (true) {
+                const opacity = (sumDist - 16) / 3
+
                 c.beginPath()
                 c.arc(drawPoint.x, drawPoint.y, 5, 0, (2*Math.PI), false)
-                c.fillStyle = '#185ADB'
+                c.fillStyle = 'rgba(20, 90, 219, ' + opacity.toString() + ')'
                 c.fill()
             }
         }
@@ -97,8 +98,8 @@ function animate() {
 }
 
 const nodeArr = [
-    new Node(100, 350, 0.8, 0),
-    new Node(1000, 400, -0.8, 0)
+    new Node(100, 350, 2.5, 0),
+    new Node(1000, 400, -2.5, 0)
 ]
 
 animate()
