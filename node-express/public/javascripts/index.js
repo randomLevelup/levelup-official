@@ -313,6 +313,7 @@ function animate() { // animation loop
     }
 
     terrF.drawFill()
+    terrF.traceCurve()
 
     bubbles.forEach(bubble => {
         bubble.update() // float bubbles
